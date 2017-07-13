@@ -1,0 +1,9 @@
+{
+	"NumberOfOps": 10,
+	"Creates" : 50,
+	"Updates" : 40,
+	"Deletes" : 10,
+	"couchbase-host": "10.111.170.101",
+	"bucket": "travel-sample",
+	"bucket-password": ""
+}

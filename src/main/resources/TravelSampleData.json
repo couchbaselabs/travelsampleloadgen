@@ -1,0 +1,55 @@
+{
+	"country": [
+		"USA",
+		"India",
+		"France",
+		"Germany"
+	],
+	"USA": {
+		"city": [
+			"New York",
+			"Washington DC",
+			"Las Angles",
+			"Las Vegas",
+			"San Francisco"
+		],
+		"timeZone": [
+			"America/Las Angles",
+			"America/Washington DC",
+			"America/Las Vegas"
+		]
+	},
+	"India": {
+		"city": [
+			"New Delhi",
+			"Mumbai",
+			"Bengaluru",
+			"Chennai",
+			"Kolkata",
+			"Hyderabad"
+		],
+		"timeZone": [
+			"India/Kolkata"
+		]
+	},
+	"France": {
+		"city": [
+			"Paris",
+			"Nice",
+			"Tours"
+		],
+		"timeZone": [
+			"Europe/central"
+		]
+	},
+	"Germany": {
+		"city": [
+			"Frankfurt",
+			"Berlin",
+			"Stuttgart"
+		],
+		"timeZone": [
+			"Europe/central"
+		]
+	}
+}
