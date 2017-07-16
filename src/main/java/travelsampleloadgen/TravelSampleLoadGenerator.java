@@ -16,7 +16,6 @@ public class TravelSampleLoadGenerator {
 		try {
 			LoadGenerator loadGen = new LoadGenerator();
 			loadGen.generate();
-			loadGen.generateRoutes();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

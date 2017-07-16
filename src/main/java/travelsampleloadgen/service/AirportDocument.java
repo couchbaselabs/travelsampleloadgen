@@ -102,9 +102,24 @@ public class AirportDocument extends DocumentTemplate {
 		this.geo = geo;
 	}
 	
-	public AirportDocument(long seed, int revison, JSONObject airportData) {
+	private void updateDocument() {
+		int randomInt = Utils.getRandomInt(1, 4);
+		switch(randomInt) {
+		case 1:
+			this.setGeo();
+			break;
+		case 2:
+			this.setIcao();
+			break;
+		case 3:
+			this.setAirportname();
+			break;
+		}
+	}
+	
+	public AirportDocument(long seed, long revison, JSONObject airportData) {
 		this.airportData = airportData;
-		this.setSeed(seed, revison);
+		this.setSeed(seed, 0);
 		Utils.setSeed(this.revisionSeed);
 		this.setId();
 		this.setAirportname();
@@ -114,6 +129,10 @@ public class AirportDocument extends DocumentTemplate {
 		this.setCity();
 		this.setTz();
 		this.setGeo();
+		if(revison > 0) {
+			this.setSeed(seed, revison);
+			updateDocument();
+		}
 		this.airport = new Airport(this.id, this.airportname, this.city, this.country, this.faa, this.icao, this.tz, this.geo);
 	}
 

@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import com.couchbase.client.java.Bucket;
@@ -20,6 +21,7 @@ import com.couchbase.client.java.query.N1qlQueryResult;
 import com.couchbase.client.java.query.N1qlQueryRow;
 import com.couchbase.client.java.query.Select;
 import com.couchbase.client.java.query.Statement;
+import com.google.gson.Gson;
 
 public class CouchbaseCURDService {
 	private Bucket bucket;
@@ -72,6 +74,17 @@ public class CouchbaseCURDService {
 			System.out.println(e);
 			return false;
 		}
+	}
+	
+	public boolean checkIfDocumentExists(String documentId) {
+		return bucket.exists(documentId);
+	}
+	
+	public JSONObject getDocumentById(String documentId) throws ParseException {
+		JsonDocument document = bucket.get(documentId);
+		JSONParser parser = new JSONParser();
+		JSONObject jsonObject = (JSONObject) parser.parse(document.content().toString());
+		return jsonObject;
 	}
 	
 	public JSONArray getExistingDocumentIdsFromBucket(String type) {

@@ -64,9 +64,24 @@ public class AirlineDocument extends DocumentTemplate {
 		this.country = (String) Utils.getRandomArrayItem(countries);
 	}
 	
-	public AirlineDocument(long seed, int revison, JSONObject airlineData) {
+	private void updateDocument() {
+		int randomInt = Utils.getRandomInt(1, 4);
+		switch(randomInt) {
+		case 1:
+			this.setCountry();
+			break;
+		case 2:
+			this.setIata();
+			break;
+		case 3:
+			this.setIcao();
+			break;
+		}
+	}
+	
+	public AirlineDocument(long seed, long revison, JSONObject airlineData) {
 		this.airlineData = airlineData;
-		this.setSeed(seed, revison);
+		this.setSeed(seed, 0);
 		Utils.setSeed(this.revisionSeed);
 		this.setId();
 		this.setName();
@@ -74,6 +89,10 @@ public class AirlineDocument extends DocumentTemplate {
 		this.setIcao();
 		this.setCallsign();
 		this.setCountry();
+		if(revison > 0) {
+			this.setSeed(seed, revison);
+			updateDocument();
+		}
 		airline = new Airline(this.id, this.name, this.iata, this.icao, this.callsign, this.country);
 	}
 	

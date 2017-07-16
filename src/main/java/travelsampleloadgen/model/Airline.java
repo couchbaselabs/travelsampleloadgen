@@ -1,5 +1,7 @@
 package travelsampleloadgen.model;
 
+import org.json.simple.JSONObject;
+
 public class Airline {
 	public long id;
 	public final String type = "airline";
@@ -16,5 +18,14 @@ public class Airline {
 		this.icao = icao;
 		this.callsign = callsign;
 		this.country = country;
+	}
+	
+	public Airline(JSONObject airline) {
+		this.id = (Long) airline.get("id");
+		this.name = (String) airline.get("name");
+		this.iata = (String) airline.get("iata");
+		this.icao = (String) airline.get("icao");
+		this.callsign = (String) airline.get("callsign");
+		this.country = (String) airline.get("country");
 	}
 }

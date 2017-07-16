@@ -2,6 +2,7 @@ package travelsampleloadgen.util;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,6 +12,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+
+import com.google.gson.Gson;
 
 public class Utils {
 	private static Random random = new Random();
@@ -26,7 +29,11 @@ public class Utils {
 	public static int getRandomInt(int min, int max) {
 		return random.nextInt(max - min + 1) + min;
 	}
-
+	
+	public static long getRandomLong(long min, long max) {
+		return (long)(random.nextDouble() * (max - min)) + min;
+	}
+	
 	public static float getRandomFloat(int min, int max) {
 		return random.nextFloat() * (max - min) + min;
 	}
@@ -108,5 +115,20 @@ public class Utils {
 		JSONParser parser = new JSONParser();
 		JSONObject properties = (JSONObject) parser.parse(new FileReader(filePath));
 		return properties.get(propertyName);
+	}
+	
+	public static Object getLoadGenPropertyFromFilePath(String propertyName, String filePath) throws FileNotFoundException, IOException, ParseException {
+		JSONParser parser = new JSONParser();
+		JSONObject properties = (JSONObject) parser.parse(new FileReader(filePath));
+		return properties.get(propertyName);
+	}
+	
+	public static void storeLoadgenDataToFiles(String fileName, Object objectToStore) throws ParseException {
+		ClassLoader classLoader = Utils.class.getClassLoader();
+		String filePath = classLoader.getResource(fileName).getPath();
+		JSONParser parser = new JSONParser();
+		Gson gson = new Gson();
+		String jsonString = gson.toJson(objectToStore);
+		JSONObject obj = (JSONObject) parser.parse(jsonString);
 	}
 }

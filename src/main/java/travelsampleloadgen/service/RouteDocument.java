@@ -131,25 +131,81 @@ public class RouteDocument extends DocumentTemplate {
 	public void setDistance() {
 		this.distance = Utils.getRandomFloat(100, 10000);
 	}
-
 	
-	public RouteDocument(long seed, int revison, JSONObject routeData) throws FileNotFoundException, IOException, ParseException {
+	private void getAirlineAndAirports() throws FileNotFoundException, IOException, ParseException {
+		CouchbaseQueryService cbQueryHelper = new CouchbaseQueryService();
+		CouchbaseCURDService cbCURDHelper = new CouchbaseCURDService();
+		JSONObject queryResult = (JSONObject) cbQueryHelper.getMinId("airline").get(0);
+		Object obj = queryResult.get("id");
+		long minAirline = obj == null ? 0 : (Long) obj;
+		queryResult = (JSONObject) cbQueryHelper.getMaxId("airline").get(0);
+		obj = queryResult.get("id");
+		long maxAirline = obj == null ? 0 : (Long) obj;
+		queryResult = (JSONObject) cbQueryHelper.getMinId("airport").get(0);
+		obj = queryResult.get("id");
+		long minAirport = obj == null ? 0 : (Long) obj;
+		queryResult = (JSONObject) cbQueryHelper.getMaxId("airport").get(0);
+		obj = queryResult.get("id");
+		long maxAirport = obj == null ? 0 : (Long) obj;
+		long airlineid = 0;
+		String airlineDocumentId = "airline_";
+		boolean found = false;
+		while(!found) {
+			airlineDocumentId = "airline_";
+			airlineid = Utils.getRandomLong(minAirline, maxAirline);
+			airlineDocumentId += airlineid;
+			if (cbCURDHelper.checkIfDocumentExists(airlineDocumentId)) {
+				found = true;
+			}
+		}
+		this.airLine = new Airline(cbCURDHelper.getDocumentById(airlineDocumentId));
+		String airportDocumentId = "airport_";
+		long sourceAirportId = 0;
+		found = false;
+		while(!found) {
+			airportDocumentId = "airport_";
+			sourceAirportId = Utils.getRandomLong(minAirport, maxAirport);
+			airportDocumentId += sourceAirportId;
+			if (cbCURDHelper.checkIfDocumentExists(airportDocumentId)) {
+				found = true;
+			}
+		}
+		this.sourceAirport = new Airport(cbCURDHelper.getDocumentById(airportDocumentId));
+		airportDocumentId = "airport_";
+		long destinationAirportId = 0;
+		found = false;
+		while(sourceAirportId == destinationAirportId || !found) {
+			airportDocumentId = "airport_";
+			destinationAirportId = Utils.getRandomLong(minAirport, maxAirport);
+			airportDocumentId += destinationAirportId;
+			if (cbCURDHelper.checkIfDocumentExists(airportDocumentId)) {
+				found = true;
+			}
+		}
+		this.destinationAirport = new Airport(cbCURDHelper.getDocumentById(airportDocumentId));
+	}
+	
+	private void updateDocument() {
+		int randomInt = Utils.getRandomInt(1, 4);
+		switch(randomInt) {
+		case 1:
+			this.setEquipment();
+			break;
+		case 2:
+			this.setDistance();
+			break;
+		case 3:
+			this.setStops();
+			break;
+		}
+	}
+	
+	public RouteDocument(long seed, long revison, JSONObject routeData) throws FileNotFoundException, IOException, ParseException {
 		this.routeData = routeData;
-		this.setSeed(seed, revison);
+		this.setSeed(seed, 0);
 		Utils.setSeed(this.revisionSeed);
 		this.setId();
-		CouchbaseCURDService cbHelper = new CouchbaseCURDService();
-		JSONArray existingDocumentIds = cbHelper.getExistingDocumentIdsFromBucket("airline");
-		int randomAirline = ((JsonObject)Utils.getRandomArrayItem(existingDocumentIds)).getInt("id");
-		this.airLine = new AirlineDocument(randomAirline, 0, routeData).airline;
-		existingDocumentIds = cbHelper.getExistingDocumentIdsFromBucket("airport");
-		int sourceAirline = ((JsonObject)Utils.getRandomArrayItem(existingDocumentIds)).getInt("id");
-		int destinationAirline = ((JsonObject)Utils.getRandomArrayItem(existingDocumentIds)).getInt("id");
-		while (sourceAirline == destinationAirline) {
-			destinationAirline = ((JsonObject)Utils.getRandomArrayItem(existingDocumentIds)).getInt("id");
-		}
-		this.sourceAirport = new AirportDocument(sourceAirline, 0, routeData).airport;
-		this.destinationAirport = new AirportDocument(destinationAirline, 0, routeData).airport;
+		this.getAirlineAndAirports();
 		this.setAirline();
 		this.setAirlineid();
 		this.setSourceairport();
@@ -158,6 +214,10 @@ public class RouteDocument extends DocumentTemplate {
 		this.setEquipment();
 		this.setSchedule();
 		this.setDistance();
+		if(revison > 0) {
+			this.setSeed(seed, revison);
+			updateDocument();
+		}
 		this.route = new Route(this.id, this.airline, this.airlineid, this.sourceairport, this.destinationairport, this.stops, this.equipment, this.schedule, this.distance);
 	}
 	
