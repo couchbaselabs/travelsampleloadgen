@@ -61,7 +61,7 @@ public class AirlineDocument extends DocumentTemplate {
 	 */
 	public void setCountry() {
 		JSONArray countries = (JSONArray)this.airlineData.get("country");
-		this.country = (String) Utils.getRandomArrayItem(countries);
+		this.country = (String) Utils.getRandomJsonArrayItem(countries);
 	}
 	
 	private void updateDocument() {

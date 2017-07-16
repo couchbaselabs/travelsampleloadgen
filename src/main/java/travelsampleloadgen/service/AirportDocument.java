@@ -49,7 +49,7 @@ public class AirportDocument extends DocumentTemplate {
 	public void setCity() {
 		JSONObject country = (JSONObject) this.airportData.get(this.country);
 		JSONArray cities = (JSONArray) country.get("city");
-		this.city = (String) Utils.getRandomArrayItem(cities);
+		this.city = (String) Utils.getRandomJsonArrayItem(cities);
 	}
 
 
@@ -58,7 +58,7 @@ public class AirportDocument extends DocumentTemplate {
 	 */
 	public void setCountry() {
 		JSONArray countries = (JSONArray)this.airportData.get("country");
-		this.country = (String) Utils.getRandomArrayItem(countries);
+		this.country = (String) Utils.getRandomJsonArrayItem(countries);
 	}
 
 
@@ -87,7 +87,7 @@ public class AirportDocument extends DocumentTemplate {
 	public void setTz() {
 		JSONObject countryDetails = (JSONObject)this.airportData.get(this.country);
 		JSONArray timeZones = (JSONArray)countryDetails.get("timeZone");
-		this.tz = (String) Utils.getRandomArrayItem(timeZones);
+		this.tz = (String) Utils.getRandomJsonArrayItem(timeZones);
 	}
 
 

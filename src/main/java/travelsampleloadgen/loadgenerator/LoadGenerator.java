@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -77,6 +78,7 @@ public class LoadGenerator {
 			this.next();
 			this.counter++;
 		}
+		this.storeMasterSeed();
 	}
 
 	public void next() throws ParseException, FileNotFoundException, IOException {
@@ -270,7 +272,16 @@ public class LoadGenerator {
 		}
 		return this.onlyCreates;
 	}
-
+	
+	private void storeMasterSeed() throws FileNotFoundException, ParseException, IOException {
+		Map<String, List<Long>> map = new HashMap<String, List<Long>>();
+		List<Long> seeds = new ArrayList<Long>();
+		seeds.add(this.masterSeed);
+		map.put("seeds", seeds);
+		String loadgenSeedsFilePath = (String) Utils.getLoadGenPropertyFromResource("loadgen-seeds", "LoadgenProperties.json");
+		Utils.updateLoadgenDataToFiles(loadgenSeedsFilePath, map);
+	}
+	
 	class DocumentType {
 		String type;
 		int offSet;
