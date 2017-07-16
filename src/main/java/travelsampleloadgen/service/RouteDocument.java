@@ -137,6 +137,16 @@ public class RouteDocument extends DocumentTemplate {
 		CouchbaseCURDService cbCURDHelper = new CouchbaseCURDService();
 		JSONObject queryResult = (JSONObject) cbQueryHelper.getMinId("airline").get(0);
 		Object obj = queryResult.get("id");
+		if(obj == null) {
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			queryResult = (JSONObject) cbQueryHelper.getMinId("airline").get(0);
+			obj = queryResult.get("id");
+		}
 		long minAirline = obj == null ? 0 : (Long) obj;
 		queryResult = (JSONObject) cbQueryHelper.getMaxId("airline").get(0);
 		obj = queryResult.get("id");
@@ -152,7 +162,7 @@ public class RouteDocument extends DocumentTemplate {
 		boolean found = false;
 		while(!found) {
 			airlineDocumentId = "airline_";
-			airlineid = Utils.getRandomLong(minAirline, maxAirline);
+			airlineid = (long) Utils.getRandomInt((int)minAirline, (int)maxAirline);
 			airlineDocumentId += airlineid;
 			if (cbCURDHelper.checkIfDocumentExists(airlineDocumentId)) {
 				found = true;
@@ -164,7 +174,7 @@ public class RouteDocument extends DocumentTemplate {
 		found = false;
 		while(!found) {
 			airportDocumentId = "airport_";
-			sourceAirportId = Utils.getRandomLong(minAirport, maxAirport);
+			sourceAirportId = (long) Utils.getRandomInt((int)minAirport, (int)maxAirport);
 			airportDocumentId += sourceAirportId;
 			if (cbCURDHelper.checkIfDocumentExists(airportDocumentId)) {
 				found = true;
@@ -176,7 +186,7 @@ public class RouteDocument extends DocumentTemplate {
 		found = false;
 		while(sourceAirportId == destinationAirportId || !found) {
 			airportDocumentId = "airport_";
-			destinationAirportId = Utils.getRandomLong(minAirport, maxAirport);
+			destinationAirportId =(long) Utils.getRandomInt((int)minAirport, (int)maxAirport);
 			airportDocumentId += destinationAirportId;
 			if (cbCURDHelper.checkIfDocumentExists(airportDocumentId)) {
 				found = true;

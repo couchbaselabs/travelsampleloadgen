@@ -103,18 +103,18 @@ public class LoadGenerator {
 		types.add("route");
 		types.add("route");
 		// Remove route from creating the document if not enough airline and airports are created yet.
-		if (this.documentTypes.get("airline").lastDocument < this.documentTypes.get("airline").firstDocument + 2
+		if (this.documentTypes.get("airline").lastDocument < this.documentTypes.get("airline").firstDocument + 4
 				|| this.documentTypes.get("airport").lastDocument < this.documentTypes.get("airport").firstDocument
-						+ 4) {
+						+ 5) {
 			types.removeIf(new Predicate<String>() {
 				public boolean test(String p) {
 					return p.equals("route");
 				}
 			});
-			if(this.documentTypes.get("airline").lastDocument < this.documentTypes.get("airline").firstDocument + 2) {
+			if(this.documentTypes.get("airline").lastDocument < this.documentTypes.get("airline").firstDocument + 4) {
 				types.add("airline");
 			}
-			if (this.documentTypes.get("airport").lastDocument < this.documentTypes.get("airport").firstDocument + 4) {
+			if (this.documentTypes.get("airport").lastDocument < this.documentTypes.get("airport").firstDocument + 5) {
 				types.add("airport");
 			}
 		}
@@ -205,7 +205,7 @@ public class LoadGenerator {
 		String type = document.type;
 		DocumentTemplate template = null;
 		while (!updated) {
-			long randomId = Utils.getRandomLong(firstDocument, lastDocument);
+			long randomId = (long) Utils.getRandomInt((int)firstDocument, (int)lastDocument);
 			if (type.equals("airline")) {
 				template = new AirlineDocument(randomId, this.numberOfUpdates + 1, this.inputData);
 			} else if (type.equals("airport")) {
@@ -221,6 +221,10 @@ public class LoadGenerator {
 				}
 			} catch (DocumentDoesNotExistException e) {
 				updated = false;
+				this.getDocumentMinId();
+				this.getDocumentsMaxId();
+				firstDocument = document.firstDocument;
+				lastDocument = document.lastDocument;
 			}
 		}
 
