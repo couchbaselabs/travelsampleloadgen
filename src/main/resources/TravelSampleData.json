@@ -3,13 +3,7 @@
 		"USA",
 		"India",
 		"France",
-		"Germany",
-		"Singapore",
-		"Australia",
-		"Japan",
-		"Russia",
-		"England",
-		"Mexico"
+		"Germany"
 	],
 	"USA": {
 		"city": [
@@ -17,16 +11,12 @@
 			"Washington DC",
 			"Las Angles",
 			"Las Vegas",
-			"San Francisco",
-			"San Jose",
-			"San Diego",
-			"Seattle",
-			"Atlanta",
-			"Boston"
+			"San Francisco"
 		],
 		"timeZone": [
-			"America/PST",
-			"America/EST"
+			"America/Las Angles",
+			"America/Washington DC",
+			"America/Las Vegas"
 		]
 	},
 	"India": {
@@ -36,11 +26,7 @@
 			"Bengaluru",
 			"Chennai",
 			"Kolkata",
-			"Hyderabad",
-			"Shimla",
-			"Lucknow",
-			"Jaipur",
-			"Ahmedabad"
+			"Hyderabad"
 		],
 		"timeZone": [
 			"India/Kolkata"
@@ -64,73 +50,6 @@
 		],
 		"timeZone": [
 			"Europe/central"
-		]
-	},
-	"Singapore": {
-		"city": [
-			"Singapore City"
-		],
-		"timeZone": [
-			"Singapore/Singapore"
-		]
-	},
-	"Australia": {
-		"city": [
-			"Melbourne",
-			"Sidney",
-			"Brisbane",
-			"Perth",
-			"Adelaide"
-		],
-		"timeZone": [
-			"Australia/western",
-			"Australia/Eastern"
-		]
-	},
-	"Japan": {
-		"city": [
-			"Tokyo",
-			"Osaka",
-			"Kyoto",
-			"Hiroshima",
-			"Nagasaki"
-		],
-		"timeZone": [
-			"Japan/Tokyo"
-		]
-	},
-	"Russia": {
-		"city": [
-			"Moscow",
-			"St.-Petersburg",
-			"Novosibirsk",
-			"Yekaterinburg"
-		],
-		"timeZone": [
-			"Russia/Moscow",
-			"Russia/St.-Petersburg",
-			"Russia/Novosibirsk"
-		]
-	},
-	"England": {
-		"city": [
-			"London",
-			"Birmingham",
-			"Manchester",
-			"Southampton"
-		],
-		"timeZone": [
-			"Europe/GMT"
-		]
-	},
-	"Mexico": {
-		"city": [
-			"Mexico city",
-			"Tijuana",
-			"Merida"
-		],
-		"timeZone": [
-			"Mexico/Mexico city"
 		]
 	}
 }

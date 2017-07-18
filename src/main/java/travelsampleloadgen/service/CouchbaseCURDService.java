@@ -82,6 +82,9 @@ public class CouchbaseCURDService {
 	
 	public JSONObject getDocumentById(String documentId) throws ParseException {
 		JsonDocument document = bucket.get(documentId);
+		if(document == null) {
+			return null;
+		}
 		JSONParser parser = new JSONParser();
 		JSONObject jsonObject = (JSONObject) parser.parse(document.content().toString());
 		return jsonObject;

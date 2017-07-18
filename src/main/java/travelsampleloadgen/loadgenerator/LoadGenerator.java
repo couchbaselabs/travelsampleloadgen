@@ -6,10 +6,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -66,7 +66,7 @@ public class LoadGenerator {
 		this.queryHelper = new CouchbaseQueryService();
 		this.documentTypes = initiateDocumentTypes();
 		this.getDocumentMinId();
-		this.getDocumentsMaxId();
+		this.getInitialDocumentsMaxId();
 		if (this.creates + this.updates + this.deletes != 100) {
 			this.updates += 100 - (this.creates + this.updates + this.deletes);
 		}
@@ -78,7 +78,6 @@ public class LoadGenerator {
 			this.next();
 			this.counter++;
 		}
-		this.storeMasterSeed();
 	}
 
 	public void next() throws ParseException, FileNotFoundException, IOException {
@@ -103,18 +102,18 @@ public class LoadGenerator {
 		types.add("route");
 		types.add("route");
 		// Remove route from creating the document if not enough airline and airports are created yet.
-		if (this.documentTypes.get("airline").lastDocument < this.documentTypes.get("airline").firstDocument + 4
+		if (this.documentTypes.get("airline").lastDocument < this.documentTypes.get("airline").firstDocument + 2
 				|| this.documentTypes.get("airport").lastDocument < this.documentTypes.get("airport").firstDocument
-						+ 5) {
+						+ 4) {
 			types.removeIf(new Predicate<String>() {
 				public boolean test(String p) {
 					return p.equals("route");
 				}
 			});
-			if(this.documentTypes.get("airline").lastDocument < this.documentTypes.get("airline").firstDocument + 4) {
+			if(this.documentTypes.get("airline").lastDocument < this.documentTypes.get("airline").firstDocument + 2) {
 				types.add("airline");
 			}
-			if (this.documentTypes.get("airport").lastDocument < this.documentTypes.get("airport").firstDocument + 5) {
+			if (this.documentTypes.get("airport").lastDocument < this.documentTypes.get("airport").firstDocument + 4) {
 				types.add("airport");
 			}
 		}
@@ -149,7 +148,7 @@ public class LoadGenerator {
 
 	}
 
-	public void delete() {
+	public void delete() throws ParseException, FileNotFoundException, IOException {
 		ArrayList<String> types = new ArrayList<String>(
 				Arrays.asList(this.documentTypes.keySet().toArray(new String[0])));
 		for (DocumentType document : this.documentTypes.values()) {
@@ -164,13 +163,19 @@ public class LoadGenerator {
 		this.numberOfDeletes++;
 	}
 
-	public void deleteDocument(DocumentType document) {
+	public void deleteDocument(DocumentType document) throws ParseException, FileNotFoundException, IOException {
 		boolean deleted = false;
 		long firstDocument = document.firstDocument;
 		long lastDocument = document.lastDocument;
 		String type = document.type;
-		while (!deleted) {
-			long randomId = Utils.getRandomLong(firstDocument, lastDocument);
+		int tries = 0;
+		while (!deleted && tries < 11) {
+			long randomId = 0;
+			if (tries == 10){
+				randomId = Utils.getRandomDocumentId(type);
+			}else {
+				randomId = Utils.getRandomLong(firstDocument, lastDocument);
+			}
 			String document_name = type + "_" + randomId;
 			try {
 				deleted = this.curdHelper.deleteFromBucket(document_name);
@@ -179,6 +184,11 @@ public class LoadGenerator {
 				}
 			} catch (DocumentDoesNotExistException e) {
 				deleted = false;
+				this.getDocumentMinId();
+				this.getDocumentsMaxId();
+				firstDocument = document.firstDocument;
+				lastDocument = document.lastDocument;
+				tries++;
 			}
 		}
 	}
@@ -204,8 +214,14 @@ public class LoadGenerator {
 		long lastDocument = document.lastDocument;
 		String type = document.type;
 		DocumentTemplate template = null;
-		while (!updated) {
-			long randomId = (long) Utils.getRandomInt((int)firstDocument, (int)lastDocument);
+		int tries = 0;
+		while (!updated && tries < 11) {
+			long randomId = 0;
+			if (tries == 10){
+				randomId = Utils.getRandomDocumentId(type);
+			}else {
+				randomId = Utils.getRandomLong(firstDocument, lastDocument);
+			}
 			if (type.equals("airline")) {
 				template = new AirlineDocument(randomId, this.numberOfUpdates + 1, this.inputData);
 			} else if (type.equals("airport")) {
@@ -225,9 +241,9 @@ public class LoadGenerator {
 				this.getDocumentsMaxId();
 				firstDocument = document.firstDocument;
 				lastDocument = document.lastDocument;
+				tries++;
 			}
 		}
-
 	}
 
 	private Map<String, DocumentType> initiateDocumentTypes() {
@@ -246,6 +262,14 @@ public class LoadGenerator {
 			JSONObject queryResult = (JSONObject) this.queryHelper.getMaxId(document.type).get(0);
 			Object obj = queryResult.get("id");
 			document.lastDocument = obj == null ? document.lastDocument : (Long) obj;
+		}
+	}
+	
+	private void getInitialDocumentsMaxId()throws ParseException {
+		for (DocumentType document : this.documentTypes.values()) {
+			JSONObject queryResult = (JSONObject) this.queryHelper.getMaxId(document.type).get(0);
+			Object obj = queryResult.get("id");
+			document.lastDocument = obj == null ? document.lastDocument : (Long) obj;
 			document.lastIteration = obj == null ? document.lastIteration : (Long) obj;
 		}
 	}
@@ -257,7 +281,7 @@ public class LoadGenerator {
 			document.firstDocument = obj == null ? document.firstDocument : (Long) obj;
 		}
 	}
-
+	
 	private void setSeeds() {
 		Utils.setSeed(this.masterSeed);
 		this.createsSeed = Utils.getRandomLong(0, this.masterSeed);
@@ -276,16 +300,7 @@ public class LoadGenerator {
 		}
 		return this.onlyCreates;
 	}
-	
-	private void storeMasterSeed() throws FileNotFoundException, ParseException, IOException {
-		Map<String, List<Long>> map = new HashMap<String, List<Long>>();
-		List<Long> seeds = new ArrayList<Long>();
-		seeds.add(this.masterSeed);
-		map.put("seeds", seeds);
-		String loadgenSeedsFilePath = (String) Utils.getLoadGenPropertyFromResource("loadgen-seeds", "LoadgenProperties.json");
-		Utils.updateLoadgenDataToFiles(loadgenSeedsFilePath, map);
-	}
-	
+
 	class DocumentType {
 		String type;
 		int offSet;

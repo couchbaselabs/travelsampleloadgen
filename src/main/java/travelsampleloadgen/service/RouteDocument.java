@@ -38,76 +38,76 @@ public class RouteDocument extends DocumentTemplate {
 	private Airline airLine;
 	private Airport sourceAirport;
 	private Airport destinationAirport;
-	
-	
+
 	/**
-	 * @param id the id to set
+	 * @param id
+	 *            the id to set
 	 */
 	public void setId() {
 		this.id = seed;
 	}
 
-
 	/**
-	 * @param airline the airline to set
+	 * @param airline
+	 *            the airline to set
 	 */
 	public void setAirline() {
 		this.airline = airLine.iata;
 	}
 
-
 	/**
-	 * @param airlineid the airlineid to set
+	 * @param airlineid
+	 *            the airlineid to set
 	 */
 	public void setAirlineid() {
 		this.airlineid = "airline_" + airLine.id;
 	}
 
-
 	/**
-	 * @param sourceairport the sourceairport to set
+	 * @param sourceairport
+	 *            the sourceairport to set
 	 */
 	public void setSourceairport() {
 		this.sourceairport = sourceAirport.faa;
 	}
 
-
 	/**
-	 * @param destinationairport the destinationairport to set
+	 * @param destinationairport
+	 *            the destinationairport to set
 	 */
 	public void setDestinationairport() {
 		this.destinationairport = destinationAirport.faa;
 	}
 
-
 	/**
-	 * @param stops the stops to set
+	 * @param stops
+	 *            the stops to set
 	 */
 	public void setStops() {
 		this.stops = Utils.getRandomInt(0, 3);
 	}
 
-
 	/**
-	 * @param equipment the equipment to set
+	 * @param equipment
+	 *            the equipment to set
 	 */
 	public void setEquipment() {
 		int numberOfEquipment = Utils.getRandomInt(1, 3);
 		this.equipment = "";
-		for(int i = 0; i < numberOfEquipment; i++) {
+		for (int i = 0; i < numberOfEquipment; i++) {
 			this.equipment += Utils.getRandomInt(0, 999) + " ";
 		}
 		this.equipment.trim();
 	}
 
-
 	/**
-	 * @param schedule the schedule to set
+	 * @param schedule
+	 *            the schedule to set
 	 */
 	public void setSchedule() {
 		int numberOfSchedules = Utils.getRandomInt(3, 20);
 		List<Schedule> schedules = new ArrayList<Schedule>();
-		for(int i = 0; i < numberOfSchedules; i++) {
+		for (int i = 0; i < numberOfSchedules; i++) {
 			Schedule schedule = new Schedule();
 			Date randDate = Utils.getRandomDate(0, Math.abs(System.currentTimeMillis()));
 			Calendar calendar = Calendar.getInstance();
@@ -124,28 +124,28 @@ public class RouteDocument extends DocumentTemplate {
 		this.schedule = schedules.toArray(new Schedule[0]);
 	}
 
-
 	/**
-	 * @param distance the distance to set
+	 * @param distance
+	 *            the distance to set
 	 */
 	public void setDistance() {
 		this.distance = Utils.getRandomFloat(100, 10000);
 	}
-	
+
 	private void getAirlineAndAirports() throws FileNotFoundException, IOException, ParseException {
 		CouchbaseQueryService cbQueryHelper = new CouchbaseQueryService();
 		CouchbaseCURDService cbCURDHelper = new CouchbaseCURDService();
 		JSONObject queryResult = (JSONObject) cbQueryHelper.getMinId("airline").get(0);
 		Object obj = queryResult.get("id");
-		if(obj == null) {
+		if (obj == null) {
 			try {
 				Thread.sleep(5000);
+				queryResult = (JSONObject) cbQueryHelper.getMinId("airline").get(0);
+				obj = queryResult.get("id");
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			queryResult = (JSONObject) cbQueryHelper.getMinId("airline").get(0);
-			obj = queryResult.get("id");
 		}
 		long minAirline = obj == null ? 0 : (Long) obj;
 		queryResult = (JSONObject) cbQueryHelper.getMaxId("airline").get(0);
@@ -160,44 +160,68 @@ public class RouteDocument extends DocumentTemplate {
 		long airlineid = 0;
 		String airlineDocumentId = "airline_";
 		boolean found = false;
-		while(!found) {
+		int tries = 0;
+		while (!found && tries < 11) {
 			airlineDocumentId = "airline_";
-			airlineid = (long) Utils.getRandomInt((int)minAirline, (int)maxAirline);
+			if (tries == 10) {
+				airlineid = Utils.getRandomDocumentId("airline");
+			} else {
+				airlineid = Utils.getRandomLong(minAirline, maxAirline);
+			}
 			airlineDocumentId += airlineid;
 			if (cbCURDHelper.checkIfDocumentExists(airlineDocumentId)) {
-				found = true;
+				this.airLine = new Airline(cbCURDHelper.getDocumentById(airlineDocumentId));
+				if (this.airLine != null) {
+					found = true;
+				}
 			}
+			tries++;
 		}
-		this.airLine = new Airline(cbCURDHelper.getDocumentById(airlineDocumentId));
 		String airportDocumentId = "airport_";
 		long sourceAirportId = 0;
 		found = false;
-		while(!found) {
+		tries = 0;
+		while (!found && tries < 11) {
 			airportDocumentId = "airport_";
-			sourceAirportId = (long) Utils.getRandomInt((int)minAirport, (int)maxAirport);
+			if (tries == 10) {
+				sourceAirportId = Utils.getRandomDocumentId("airport");
+			} else {
+				sourceAirportId = Utils.getRandomLong(minAirport, maxAirport);
+			}
 			airportDocumentId += sourceAirportId;
 			if (cbCURDHelper.checkIfDocumentExists(airportDocumentId)) {
-				found = true;
+				this.sourceAirport = new Airport(cbCURDHelper.getDocumentById(airportDocumentId));
+				if (this.sourceAirport != null) {
+					found = true;
+				}
 			}
+			tries++;
 		}
-		this.sourceAirport = new Airport(cbCURDHelper.getDocumentById(airportDocumentId));
 		airportDocumentId = "airport_";
 		long destinationAirportId = 0;
 		found = false;
-		while(sourceAirportId == destinationAirportId || !found) {
+		tries = 0;
+		while ((sourceAirportId == destinationAirportId || !found) && tries < 20) {
 			airportDocumentId = "airport_";
-			destinationAirportId =(long) Utils.getRandomInt((int)minAirport, (int)maxAirport);
+			if (tries >= 10) {
+				destinationAirportId = Utils.getRandomDocumentId("airport");
+			} else {
+				destinationAirportId = Utils.getRandomLong(minAirport, maxAirport);
+			}
 			airportDocumentId += destinationAirportId;
 			if (cbCURDHelper.checkIfDocumentExists(airportDocumentId)) {
-				found = true;
+				this.destinationAirport = new Airport(cbCURDHelper.getDocumentById(airportDocumentId));
+				if (this.destinationAirport != null) {
+					found = true;
+				}
 			}
+			tries++;
 		}
-		this.destinationAirport = new Airport(cbCURDHelper.getDocumentById(airportDocumentId));
 	}
-	
+
 	private void updateDocument() {
 		int randomInt = Utils.getRandomInt(1, 4);
-		switch(randomInt) {
+		switch (randomInt) {
 		case 1:
 			this.setEquipment();
 			break;
@@ -209,8 +233,9 @@ public class RouteDocument extends DocumentTemplate {
 			break;
 		}
 	}
-	
-	public RouteDocument(long seed, long revison, JSONObject routeData) throws FileNotFoundException, IOException, ParseException {
+
+	public RouteDocument(long seed, long revison, JSONObject routeData)
+			throws FileNotFoundException, IOException, ParseException {
 		this.routeData = routeData;
 		this.setSeed(seed, 0);
 		Utils.setSeed(this.revisionSeed);
@@ -224,13 +249,14 @@ public class RouteDocument extends DocumentTemplate {
 		this.setEquipment();
 		this.setSchedule();
 		this.setDistance();
-		if(revison > 0) {
+		if (revison > 0) {
 			this.setSeed(seed, revison);
 			updateDocument();
 		}
-		this.route = new Route(this.id, this.airline, this.airlineid, this.sourceairport, this.destinationairport, this.stops, this.equipment, this.schedule, this.distance);
+		this.route = new Route(this.id, this.airline, this.airlineid, this.sourceairport, this.destinationairport,
+				this.stops, this.equipment, this.schedule, this.distance);
 	}
-	
+
 	@Override
 	public JSONObject getJsonObject() throws ParseException {
 		Gson gson = new Gson();
