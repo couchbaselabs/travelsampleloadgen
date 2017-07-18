@@ -8,13 +8,15 @@ import org.json.simple.JSONArray;
 import org.json.simple.parser.ParseException;
 
 import travelsampleloadgen.loadgenerator.LoadGenerator;
+import travelsampleloadgen.loadgenerator.MobileLoadGenerator;
+import travelsampleloadgen.loadgenerator.SDKLoadGenerator;
 import travelsampleloadgen.service.CouchbaseCURDService;
 
 public class TravelSampleLoadGenerator {
 	
 	public static void main(String[] args) {
 		try {
-			LoadGenerator loadGen = new LoadGenerator();
+			LoadGenerator loadGen = new SDKLoadGenerator();
 			loadGen.generate();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block

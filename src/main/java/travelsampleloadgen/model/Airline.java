@@ -21,11 +21,15 @@ public class Airline {
 	}
 	
 	public Airline(JSONObject airline) {
+		try {
 		this.id = (Long) airline.get("id");
 		this.name = (String) airline.get("name");
 		this.iata = (String) airline.get("iata");
 		this.icao = (String) airline.get("icao");
 		this.callsign = (String) airline.get("callsign");
 		this.country = (String) airline.get("country");
+		} catch (java.lang.NullPointerException e) {
+			System.out.println(e);
+		}
 	}
 }

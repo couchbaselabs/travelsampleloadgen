@@ -27,6 +27,7 @@ public class Airport {
 	}
 	
 	public Airport(JSONObject airport) {
+		try {
 		this.id = (Long) airport.get("id");
 		this.airportname = (String) airport.get("airportname");
 		this.city = (String) airport.get("city");
@@ -35,5 +36,8 @@ public class Airport {
 		this.icao = (String) airport.get("icao");
 		this.tz = (String) airport.get("tz");
 		this.geo = (Map<?, ?>) airport.get("geo");
+		} catch (java.lang.NullPointerException e) {
+			System.out.println(e);
+		}
 	}
 }

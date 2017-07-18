@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -18,21 +17,19 @@ import com.couchbase.client.java.error.DocumentDoesNotExistException;
 
 import travelsampleloadgen.service.AirlineDocument;
 import travelsampleloadgen.service.AirportDocument;
-import travelsampleloadgen.service.CouchbaseCURDService;
 import travelsampleloadgen.service.CouchbaseQueryService;
 import travelsampleloadgen.service.DocumentTemplate;
 import travelsampleloadgen.service.RouteDocument;
 import travelsampleloadgen.util.Utils;
 
-public class LoadGenerator {
-	private long numberOfOps;
+public abstract class LoadGenerator {
+	long numberOfOps;
 	private long counter;
 	private long creates;
 	private long updates;
 	private long deletes;
 	private JSONParser parser;
 	private JSONObject inputData;
-	private CouchbaseCURDService curdHelper;
 	private CouchbaseQueryService queryHelper;
 	private long numberOfCreates;
 	private long numberOfUpdates;
@@ -48,7 +45,7 @@ public class LoadGenerator {
 		this(Utils.getFilePathFromResources("LoadgenProperties.json"),
 				Utils.getFilePathFromResources("TravelSampleData.json"));
 	}
-
+	
 	public LoadGenerator(String propertiesFile, String inputDataFile)
 			throws FileNotFoundException, IOException, ParseException {
 		this.numberOfOps = (Long) Utils.getLoadGenPropertyFromFilePath("NumberOfOps", propertiesFile);
@@ -62,7 +59,6 @@ public class LoadGenerator {
 		this.setSeeds();
 		parser = new JSONParser();
 		this.inputData = (JSONObject) parser.parse(new FileReader(inputDataFile));
-		this.curdHelper = new CouchbaseCURDService();
 		this.queryHelper = new CouchbaseQueryService();
 		this.documentTypes = initiateDocumentTypes();
 		this.getDocumentMinId();
@@ -139,7 +135,7 @@ public class LoadGenerator {
 		}
 		JSONObject jsonDocument = template.getJsonObject();
 		String documentId = type + "_" + jsonDocument.get("id").toString();
-		boolean success = this.curdHelper.insertToBucket(jsonDocument, documentId);
+		boolean success = this.createDocumentToServer(jsonDocument, documentId);
 		if (success) {
 			document.lastDocument = seed;
 			document.numCreated++;
@@ -178,9 +174,16 @@ public class LoadGenerator {
 			}
 			String document_name = type + "_" + randomId;
 			try {
-				deleted = this.curdHelper.deleteFromBucket(document_name);
+				deleted = this.deleteDocumentFromServer(document_name);
 				if (deleted) {
 					System.out.println("Successfully deleted " + document_name);
+				} else  {
+					deleted = false;
+					this.getDocumentMinId();
+					this.getDocumentsMaxId();
+					firstDocument = document.firstDocument;
+					lastDocument = document.lastDocument;
+					tries++;
 				}
 			} catch (DocumentDoesNotExistException e) {
 				deleted = false;
@@ -231,9 +234,17 @@ public class LoadGenerator {
 			}
 			String document_name = type + "_" + randomId;
 			try {
-				updated = this.curdHelper.updateToBucket(template.getJsonObject(), document_name);
+				updated = this.updateDocumentToServer(template.getJsonObject(), document_name);
 				if (updated) {
 					System.out.println("Successfully updated " + document_name);
+				}
+				else {
+					updated = false;
+					this.getDocumentMinId();
+					this.getDocumentsMaxId();
+					firstDocument = document.firstDocument;
+					lastDocument = document.lastDocument;
+					tries++;
 				}
 			} catch (DocumentDoesNotExistException e) {
 				updated = false;
@@ -245,6 +256,12 @@ public class LoadGenerator {
 			}
 		}
 	}
+	
+	public abstract boolean createDocumentToServer(JSONObject document, String documentId);
+	
+	public abstract boolean updateDocumentToServer(JSONObject document, String documentId);
+	
+	public abstract boolean deleteDocumentFromServer(String documentId);
 
 	private Map<String, DocumentType> initiateDocumentTypes() {
 		Map<String, DocumentType> documentTypes = new HashMap<String, LoadGenerator.DocumentType>();

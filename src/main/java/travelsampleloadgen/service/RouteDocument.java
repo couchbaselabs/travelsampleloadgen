@@ -170,9 +170,12 @@ public class RouteDocument extends DocumentTemplate {
 			}
 			airlineDocumentId += airlineid;
 			if (cbCURDHelper.checkIfDocumentExists(airlineDocumentId)) {
-				this.airLine = new Airline(cbCURDHelper.getDocumentById(airlineDocumentId));
-				if (this.airLine != null) {
-					found = true;
+				JSONObject document = cbCURDHelper.getDocumentById(airlineDocumentId);
+				if(document != null && !document.containsKey("_deleted")) {
+					this.airLine = new Airline(document);
+					if (this.airLine != null) {
+						found = true;
+					}
 				}
 			}
 			tries++;
@@ -190,9 +193,12 @@ public class RouteDocument extends DocumentTemplate {
 			}
 			airportDocumentId += sourceAirportId;
 			if (cbCURDHelper.checkIfDocumentExists(airportDocumentId)) {
-				this.sourceAirport = new Airport(cbCURDHelper.getDocumentById(airportDocumentId));
-				if (this.sourceAirport != null) {
-					found = true;
+				JSONObject document = cbCURDHelper.getDocumentById(airportDocumentId);
+				if(document != null && !document.containsKey("_deleted")) {
+					this.sourceAirport = new Airport(cbCURDHelper.getDocumentById(airportDocumentId));
+					if (this.sourceAirport != null) {
+						found = true;
+					}
 				}
 			}
 			tries++;
@@ -210,9 +216,12 @@ public class RouteDocument extends DocumentTemplate {
 			}
 			airportDocumentId += destinationAirportId;
 			if (cbCURDHelper.checkIfDocumentExists(airportDocumentId)) {
-				this.destinationAirport = new Airport(cbCURDHelper.getDocumentById(airportDocumentId));
-				if (this.destinationAirport != null) {
-					found = true;
+				JSONObject document = cbCURDHelper.getDocumentById(airportDocumentId);
+				if(document != null && !document.containsKey("_deleted")) {
+					this.destinationAirport = new Airport(document);
+					if (this.destinationAirport != null) {
+						found = true;
+					}
 				}
 			}
 			tries++;

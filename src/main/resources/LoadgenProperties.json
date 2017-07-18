@@ -6,5 +6,7 @@
 	"couchbase-host": "10.111.170.101",
 	"bucket": "travel-sample",
 	"bucket-password": "",
-	"loadgen-seeds": "/tmp/loadgenseeds.json"
+	"loadgen-seeds": "/tmp/loadgenseeds.json",
+	"mobile-host": "10.111.170.101:4984" ,
+	"mobile-db": "travel-sample"
 }
