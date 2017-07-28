@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -74,6 +75,7 @@ public abstract class LoadGenerator {
 			this.next();
 			this.counter++;
 		}
+		this.storeLoadgenStats();
 	}
 
 	public void next() throws ParseException, FileNotFoundException, IOException {
@@ -306,6 +308,7 @@ public abstract class LoadGenerator {
 		this.deletesSeed = Utils.getRandomLong(0, this.masterSeed);
 	}
 
+	@SuppressWarnings("unused")
 	private boolean onlyCreates() {
 		if (this.onlyCreates) {
 			this.onlyCreates = false;
@@ -317,7 +320,27 @@ public abstract class LoadGenerator {
 		}
 		return this.onlyCreates;
 	}
-
+	
+	private void storeLoadgenStats() throws FileNotFoundException, IOException, ParseException {
+		Map<String, List<LoadgenStats>> loadgenStatsToStore = new HashMap<String, List<LoadgenStats>>();
+		List<LoadgenStats> list = new ArrayList<LoadGenerator.LoadgenStats>();
+		LoadgenStats loadgenStats = new LoadgenStats();
+		loadgenStats.masterSeed = this.masterSeed;
+		loadgenStats.numberOfOps = this.counter;
+		loadgenStats.creates = this.numberOfCreates;
+		loadgenStats.updates = this.numberOfUpdates;
+		loadgenStats.deletes = this.numberOfDeletes;
+		if(this instanceof MobileLoadGenerator) {
+			loadgenStats.mobile = true;
+		} else {
+			loadgenStats.mobile = false;
+		}
+		list.add(loadgenStats);
+		loadgenStatsToStore.put("LoadgenData", list);
+		String loadGenStatsFilePath = (String) Utils.getLoadGenPropertyFromResource("loadgen-stats", "LoadgenProperties.json");
+		Utils.updateLoadgenDataToFiles(loadGenStatsFilePath, loadgenStatsToStore);
+	}
+	
 	class DocumentType {
 		String type;
 		int offSet;
@@ -334,5 +357,14 @@ public abstract class LoadGenerator {
 			this.lastIteration = 10000 * offset;
 			this.numCreated = 0;
 		}
+	}
+	
+	class LoadgenStats {
+		long masterSeed;
+		long numberOfOps;
+		long creates;
+		long updates;
+		long deletes;
+		boolean mobile;
 	}
 }

@@ -8,12 +8,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import com.couchbase.client.java.document.json.JsonObject;
 import com.google.gson.Gson;
 
 import travelsampleloadgen.model.Airline;

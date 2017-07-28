@@ -1,12 +1,12 @@
 {
-	"NumberOfOps": 200,
+	"NumberOfOps": 200000,
 	"Creates" : 50,
 	"Updates" : 40,
 	"Deletes" : 10,
-	"couchbase-host": "10.111.170.101",
+	"couchbase-host": "10.111.170.102",
 	"bucket": "travel-sample",
 	"bucket-password": "",
-	"loadgen-seeds": "/tmp/loadgenseeds.json",
+	"loadgen-stats": "/tmp/loadgenseeds.json",
 	"mobile-host": "10.111.170.101:4984" ,
 	"mobile-db": "travel-sample"
 }

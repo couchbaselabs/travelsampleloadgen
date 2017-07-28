@@ -125,13 +125,42 @@ public class Utils {
 		return properties.get(propertyName);
 	}
 	
-	public static void storeLoadgenDataToFiles(String fileName, Object objectToStore) throws ParseException {
-		ClassLoader classLoader = Utils.class.getClassLoader();
-		String filePath = classLoader.getResource(fileName).getPath();
+	@SuppressWarnings("unchecked")
+	public static JSONObject deepMergeJSONObjects(JSONObject source, JSONObject target) {
+	    for (Object key: source.keySet()) {
+	            Object value = source.get(key);
+	            if (!target.containsKey(key)) {
+	                // new value for "key":
+	                target.put(key, value);
+	            } else {
+	                // existing value for "key" - recursively deep merge:
+	                if (value instanceof JSONObject) {
+	                    JSONObject valueJson = (JSONObject)value;
+	                    deepMergeJSONObjects(valueJson, (JSONObject)target.get(key));
+	                } else if (value instanceof JSONArray) {
+	                		JSONArray sourceArray = (JSONArray) value;
+	                		JSONArray targetArray = (JSONArray) target.get(key);
+	                		for(Object v : sourceArray) {
+	                			targetArray.add(v);
+	                		}
+	                } else {
+	                    target.put(key, value);
+	                }
+	            }
+	    }
+	    return target;
+	}
+	
+	public static void updateLoadgenDataToFiles(String filePath, Object objectToStore) throws ParseException, FileNotFoundException, IOException {
 		JSONParser parser = new JSONParser();
 		Gson gson = new Gson();
-		String jsonString = gson.toJson(objectToStore);
-		JSONObject obj = (JSONObject) parser.parse(jsonString);
+		JSONObject originalJson = (JSONObject) parser.parse(new FileReader(filePath));
+		JSONObject appendJson = (JSONObject) parser.parse(gson.toJson(objectToStore));
+		JSONObject jsonToStore = Utils.deepMergeJSONObjects(appendJson, originalJson);
+		FileWriter writer = new FileWriter(filePath);
+		writer.write(jsonToStore.toJSONString());
+		writer.flush();
+		writer.close();
 	}
 	
 	public static long getRandomDocumentId(String type) throws ParseException, FileNotFoundException, IOException {
