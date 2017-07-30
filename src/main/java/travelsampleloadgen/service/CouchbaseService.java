@@ -3,6 +3,9 @@ package travelsampleloadgen.service;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -10,6 +13,8 @@ import org.json.simple.parser.ParseException;
 
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.CouchbaseCluster;
+
+import travelsampleloadgen.util.Constants;
 
 public class CouchbaseService {
 	private Bucket bucket;
@@ -25,14 +30,15 @@ public class CouchbaseService {
 	public static CouchbaseService instance;
 	
 	private CouchbaseService() throws FileNotFoundException, IOException, ParseException {
-		ClassLoader classLoader = getClass().getClassLoader();
-		String fileName = classLoader.getResource("LoadgenProperties.json").getPath();
+		Constants constants = Constants.getInstance();
+		String fileName = constants.getLoadgenPropertiesFile();
 		JSONParser parser = new JSONParser();
 		JSONObject properties = (JSONObject) parser.parse(new FileReader(fileName));
 		String hostName = (String) properties.get("couchbase-host");
+		List<String> hostNames = new ArrayList<String>(Arrays.asList(hostName.split(",")));
 		String bucketName = (String)properties.get("bucket");
 		String bucketPassword = (String)properties.get("bucket-password");
-		this.couchbaseCluster = CouchbaseCluster.create(hostName);
+		this.couchbaseCluster = CouchbaseCluster.create(hostNames);
 		this.bucket = couchbaseCluster.openBucket(bucketName, bucketPassword);
 	}
 	

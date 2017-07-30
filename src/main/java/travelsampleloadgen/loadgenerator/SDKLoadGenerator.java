@@ -7,6 +7,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
 import travelsampleloadgen.service.CouchbaseCURDService;
+import travelsampleloadgen.util.Constants;
 import travelsampleloadgen.util.Utils;
 
 public class SDKLoadGenerator extends LoadGenerator {
@@ -14,8 +15,8 @@ public class SDKLoadGenerator extends LoadGenerator {
 	private CouchbaseCURDService curdHelper;
 	
 	public SDKLoadGenerator() throws FileNotFoundException, IOException, ParseException {
-		this(Utils.getFilePathFromResources("LoadgenProperties.json"),
-				Utils.getFilePathFromResources("TravelSampleData.json"));
+		this(Constants.getInstance().getLoadgenPropertiesFile(),
+				Constants.getInstance().getTravelSampleDataFilePath());
 	}
 	
 	public SDKLoadGenerator(String propertiesFile, String inputDataFile)

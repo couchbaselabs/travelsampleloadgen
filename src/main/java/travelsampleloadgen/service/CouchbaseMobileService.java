@@ -13,6 +13,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import travelsampleloadgen.util.Constants;
+
 public class CouchbaseMobileService {
 	URL url;
 	HttpURLConnection connection;
@@ -21,8 +23,8 @@ public class CouchbaseMobileService {
 	String hostName;
 	
 	public CouchbaseMobileService() throws FileNotFoundException, IOException, ParseException {
-		ClassLoader classLoader = getClass().getClassLoader();
-		String fileName = classLoader.getResource("LoadgenProperties.json").getPath();
+		Constants constants = Constants.getInstance();
+		String fileName = constants.getLoadgenPropertiesFile();
 		JSONParser parser = new JSONParser();
 		JSONObject properties = (JSONObject) parser.parse(new FileReader(fileName));
 		hostName = (String) properties.get("mobile-host");

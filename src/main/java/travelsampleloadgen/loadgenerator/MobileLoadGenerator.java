@@ -8,6 +8,7 @@ import org.json.simple.parser.ParseException;
 
 import travelsampleloadgen.service.CouchbaseCURDService;
 import travelsampleloadgen.service.CouchbaseMobileService;
+import travelsampleloadgen.util.Constants;
 import travelsampleloadgen.util.Utils;
 
 public class MobileLoadGenerator extends LoadGenerator {
@@ -15,8 +16,8 @@ public class MobileLoadGenerator extends LoadGenerator {
 	private CouchbaseMobileService cbMobileHelper;
 	
 	public MobileLoadGenerator() throws FileNotFoundException, IOException, ParseException {
-		this(Utils.getFilePathFromResources("LoadgenProperties.json"),
-				Utils.getFilePathFromResources("TravelSampleData.json"));
+		this(Constants.getInstance().getLoadgenPropertiesFile(),
+				Constants.getInstance().getTravelSampleDataFilePath());
 	}
 	
 	public MobileLoadGenerator(String propertiesFile, String inputDataFile)

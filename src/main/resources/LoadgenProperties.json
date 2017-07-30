@@ -1,9 +1,9 @@
 {
-	"NumberOfOps": 200000,
+	"NumberOfOps": 200,
 	"Creates" : 50,
 	"Updates" : 40,
 	"Deletes" : 10,
-	"couchbase-host": "10.111.170.102",
+	"couchbase-host": "10.111.170.101,10.111.170.102",
 	"bucket": "travel-sample",
 	"bucket-password": "",
 	"loadgen-stats": "/tmp/loadgenseeds.json",

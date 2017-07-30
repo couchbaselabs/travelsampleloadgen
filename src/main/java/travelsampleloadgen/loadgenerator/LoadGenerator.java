@@ -21,6 +21,7 @@ import travelsampleloadgen.service.AirportDocument;
 import travelsampleloadgen.service.CouchbaseQueryService;
 import travelsampleloadgen.service.DocumentTemplate;
 import travelsampleloadgen.service.RouteDocument;
+import travelsampleloadgen.util.Constants;
 import travelsampleloadgen.util.Utils;
 
 public abstract class LoadGenerator {
@@ -43,8 +44,8 @@ public abstract class LoadGenerator {
 	private Map<String, DocumentType> documentTypes;
 
 	public LoadGenerator() throws FileNotFoundException, IOException, ParseException {
-		this(Utils.getFilePathFromResources("LoadgenProperties.json"),
-				Utils.getFilePathFromResources("TravelSampleData.json"));
+		this(Constants.getInstance().getLoadgenPropertiesFile(),
+				Constants.getInstance().getTravelSampleDataFilePath());
 	}
 	
 	public LoadGenerator(String propertiesFile, String inputDataFile)
@@ -337,7 +338,7 @@ public abstract class LoadGenerator {
 		}
 		list.add(loadgenStats);
 		loadgenStatsToStore.put("LoadgenData", list);
-		String loadGenStatsFilePath = (String) Utils.getLoadGenPropertyFromResource("loadgen-stats", "LoadgenProperties.json");
+		String loadGenStatsFilePath = (String) Utils.getLoadGenPropertyFromFilePath("loadgen-stats", Constants.getInstance().getLoadgenPropertiesFile());
 		Utils.updateLoadgenDataToFiles(loadGenStatsFilePath, loadgenStatsToStore);
 	}
 	
