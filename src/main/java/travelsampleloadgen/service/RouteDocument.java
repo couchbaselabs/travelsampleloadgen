@@ -36,6 +36,10 @@ public class RouteDocument extends DocumentTemplate {
 	private Airline airLine;
 	private Airport sourceAirport;
 	private Airport destinationAirport;
+	public static long minAirlineId;
+	public static long maxAirlineId;
+	public static long minAirportId;
+	public static long maxAirportId;
 
 	/**
 	 * @param id
@@ -133,7 +137,7 @@ public class RouteDocument extends DocumentTemplate {
 	private void getAirlineAndAirports() throws FileNotFoundException, IOException, ParseException {
 		CouchbaseQueryService cbQueryHelper = new CouchbaseQueryService();
 		CouchbaseCURDService cbCURDHelper = new CouchbaseCURDService();
-		JSONObject queryResult = (JSONObject) cbQueryHelper.getMinId("airline").get(0);
+		/*JSONObject queryResult = (JSONObject) cbQueryHelper.getMinId("airline").get(0);
 		Object obj = queryResult.get("id");
 		if (obj == null) {
 			try {
@@ -154,7 +158,8 @@ public class RouteDocument extends DocumentTemplate {
 		long minAirport = obj == null ? 0 : (Long) obj;
 		queryResult = (JSONObject) cbQueryHelper.getMaxId("airport").get(0);
 		obj = queryResult.get("id");
-		long maxAirport = obj == null ? 0 : (Long) obj;
+		long maxAirport = obj == null ? 0 : (Long) obj;*/
+		
 		long airlineid = 0;
 		String airlineDocumentId = "airline_";
 		boolean found = false;
@@ -164,7 +169,7 @@ public class RouteDocument extends DocumentTemplate {
 			if (tries == 10) {
 				airlineid = Utils.getRandomDocumentId("airline");
 			} else {
-				airlineid = Utils.getRandomLong(minAirline, maxAirline);
+				airlineid = Utils.getRandomLong(minAirlineId, maxAirlineId);
 			}
 			airlineDocumentId += airlineid;
 			if (cbCURDHelper.checkIfDocumentExists(airlineDocumentId)) {
@@ -187,7 +192,7 @@ public class RouteDocument extends DocumentTemplate {
 			if (tries == 10) {
 				sourceAirportId = Utils.getRandomDocumentId("airport");
 			} else {
-				sourceAirportId = Utils.getRandomLong(minAirport, maxAirport);
+				sourceAirportId = Utils.getRandomLong(minAirportId, maxAirportId);
 			}
 			airportDocumentId += sourceAirportId;
 			if (cbCURDHelper.checkIfDocumentExists(airportDocumentId)) {
@@ -210,7 +215,7 @@ public class RouteDocument extends DocumentTemplate {
 			if (tries >= 10) {
 				destinationAirportId = Utils.getRandomDocumentId("airport");
 			} else {
-				destinationAirportId = Utils.getRandomLong(minAirport, maxAirport);
+				destinationAirportId = Utils.getRandomLong(minAirportId, maxAirportId);
 			}
 			airportDocumentId += destinationAirportId;
 			if (cbCURDHelper.checkIfDocumentExists(airportDocumentId)) {

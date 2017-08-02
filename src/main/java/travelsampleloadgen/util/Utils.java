@@ -154,9 +154,20 @@ public class Utils {
 	public static void updateLoadgenDataToFiles(String filePath, Object objectToStore) throws ParseException, FileNotFoundException, IOException {
 		JSONParser parser = new JSONParser();
 		Gson gson = new Gson();
-		JSONObject originalJson = (JSONObject) parser.parse(new FileReader(filePath));
+		FileReader reader;
+		try {
+		reader = new FileReader(filePath);
+		} catch(FileNotFoundException e) {
+			FileWriter newFile = new FileWriter(filePath);
+			newFile.write("{}");
+			newFile.flush();
+			newFile.close();
+			reader = new FileReader(filePath);
+		}
+		JSONObject originalJson = (JSONObject) parser.parse(reader);
 		JSONObject appendJson = (JSONObject) parser.parse(gson.toJson(objectToStore));
 		JSONObject jsonToStore = Utils.deepMergeJSONObjects(appendJson, originalJson);
+		reader.close();
 		FileWriter writer = new FileWriter(filePath);
 		writer.write(jsonToStore.toJSONString());
 		writer.flush();

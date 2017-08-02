@@ -142,7 +142,8 @@ public abstract class LoadGenerator {
 		if (success) {
 			document.lastDocument = seed;
 			document.numCreated++;
-			System.out.println("Successfully inserted " + documentId);
+			this.setRouteMaxIds();
+			//System.out.println("Successfully inserted " + documentId);
 		}
 
 	}
@@ -179,7 +180,7 @@ public abstract class LoadGenerator {
 			try {
 				deleted = this.deleteDocumentFromServer(document_name);
 				if (deleted) {
-					System.out.println("Successfully deleted " + document_name);
+					//System.out.println("Successfully deleted " + document_name);
 				} else  {
 					deleted = false;
 					this.getDocumentMinId();
@@ -239,7 +240,7 @@ public abstract class LoadGenerator {
 			try {
 				updated = this.updateDocumentToServer(template.getJsonObject(), document_name);
 				if (updated) {
-					System.out.println("Successfully updated " + document_name);
+					//System.out.println("Successfully updated " + document_name);
 				}
 				else {
 					updated = false;
@@ -283,6 +284,7 @@ public abstract class LoadGenerator {
 			Object obj = queryResult.get("id");
 			document.lastDocument = obj == null ? document.lastDocument : (Long) obj;
 		}
+		this.setRouteMaxIds();
 	}
 	
 	private void getInitialDocumentsMaxId()throws ParseException {
@@ -292,6 +294,7 @@ public abstract class LoadGenerator {
 			document.lastDocument = obj == null ? document.lastDocument : (Long) obj;
 			document.lastIteration = obj == null ? document.lastIteration : (Long) obj;
 		}
+		this.setRouteMaxIds();
 	}
 
 	private void getDocumentMinId() throws ParseException {
@@ -300,6 +303,16 @@ public abstract class LoadGenerator {
 			Object obj = queryResult.get("id");
 			document.firstDocument = obj == null ? document.firstDocument : (Long) obj;
 		}
+		this.setRouteMaxIds();
+	}
+	
+	private void setRouteMaxIds() {
+		DocumentType document = this.documentTypes.get("airline");
+		RouteDocument.minAirlineId = document.firstDocument;
+		RouteDocument.maxAirlineId = document.lastDocument;
+		document = this.documentTypes.get("airport");
+		RouteDocument.minAirportId = document.firstDocument;
+		RouteDocument.maxAirportId = document.lastDocument;
 	}
 	
 	private void setSeeds() {
