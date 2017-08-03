@@ -39,26 +39,13 @@ public class TravelSampleLoadGenerator {
 			e.printStackTrace();
 		}
 		try {
-			for(int i=0; i < 5; i++) {
-				long threadStart = System.currentTimeMillis();
-				LoadGeneratorMainThread loadgen = new LoadGeneratorMainThread(mobile);
-				loadgen.start();
-				//QueryLoadGenerator queryLoadgen = new QueryLoadGenerator();
-				//queryLoadgen.start();
-				loadgen.join();
-				long threadStop = System.currentTimeMillis();
-				//queryLoadgen.setStopThread(true);
-				//queryLoadgen.join();
-				Thread.sleep(10000);
-				long oldStart = System.currentTimeMillis();
-				LoadGenerator load = new SDKLoadGenerator();
-				load.generate();
-				long oldStop = System.currentTimeMillis();
-				System.out.println("Thread = " + (threadStop - threadStart));
-				System.out.println("Old = " + (oldStop - oldStart));
-				System.out.println();
-				Thread.sleep(10000);
-			}
+			LoadGeneratorMainThread loadgen = new LoadGeneratorMainThread(mobile);
+			loadgen.start();
+			QueryLoadGenerator queryLoadgen = new QueryLoadGenerator();
+			queryLoadgen.start();
+			loadgen.join();
+			queryLoadgen.setStopThread(true);
+			queryLoadgen.join();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -83,12 +70,13 @@ public class TravelSampleLoadGenerator {
 		}
 	}
 
-	public static void getOptions(String[] args) throws org.apache.commons.cli.ParseException, FileNotFoundException, IOException, ParseException {
+	public static void getOptions(String[] args)
+			throws org.apache.commons.cli.ParseException, FileNotFoundException, IOException, ParseException {
 		Options options = new Options();
 		Option loadGenPropertiesFilePath = Option.builder().desc("Loadgenerator Properties File path").hasArg()
 				.longOpt("loadgen-properties").required(false).argName("file-path").build();
 		Option sampleDataFilePath = Option.builder().desc("Loadgen sample data file path").hasArg()
-				.longOpt("sample-data-file").required(true ).argName("file-path").build();
+				.longOpt("sample-data-file").required(true).argName("file-path").build();
 		options.addOption(loadGenPropertiesFilePath);
 		options.addOption(sampleDataFilePath);
 		options.addOption("m", "mobile", false, "Load generate through Mobile sync gateway");
