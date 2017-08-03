@@ -28,6 +28,15 @@ public class TravelSampleLoadGenerator {
 		} catch (org.apache.commons.cli.ParseException e1) {
 			e1.printStackTrace();
 			return;
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		try {
 			for(int i=0; i < 5; i++) {
@@ -74,7 +83,7 @@ public class TravelSampleLoadGenerator {
 		}
 	}
 
-	public static void getOptions(String[] args) throws org.apache.commons.cli.ParseException {
+	public static void getOptions(String[] args) throws org.apache.commons.cli.ParseException, FileNotFoundException, IOException, ParseException {
 		Options options = new Options();
 		Option loadGenPropertiesFilePath = Option.builder().desc("Loadgenerator Properties File path").hasArg()
 				.longOpt("loadgen-properties").required(false).argName("file-path").build();
@@ -98,6 +107,7 @@ public class TravelSampleLoadGenerator {
 		} else {
 			mobile = false;
 		}
+		constants.initializeLoadgenConstants();
 	}
 
 }

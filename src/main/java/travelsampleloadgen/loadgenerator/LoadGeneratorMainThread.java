@@ -32,8 +32,9 @@ public class LoadGeneratorMainThread extends Thread {
 	private LoadGeneratorMainThread(String propertiesFile, String inputDataFile)
 			throws FileNotFoundException, IOException, ParseException {
 		this.setName("LoadGeneratorMainThread");
-		this.numberOfOps = (Long) util.getLoadGenPropertyFromFilePath("NumberOfOps", propertiesFile);
-		this.numberOfThreads = ((Long) util.getLoadGenPropertyFromFilePath("threads", propertiesFile)).intValue();
+		Constants.getInstance().initializeLoadgenConstants();
+		this.numberOfOps = Constants.numberOfOps;
+		this.numberOfThreads = ((Long) Constants.threads).intValue();
 		this.masterSeed = System.currentTimeMillis();
 		this.util.setSeed(masterSeed);
 		this.sharedWorkerData = new SharedWorkerData();
@@ -103,8 +104,7 @@ public class LoadGeneratorMainThread extends Thread {
 		loadgenStats.mobile = this.mobile;
 		list.add(loadgenStats);
 		loadgenStatsToStore.put("LoadgenData", list);
-		String loadGenStatsFilePath = (String) util.getLoadGenPropertyFromFilePath("loadgen-stats",
-				Constants.getInstance().getLoadgenPropertiesFile());
+		String loadGenStatsFilePath = Constants.loadgen_stats_file;
 		util.updateLoadgenDataToFiles(loadGenStatsFilePath, loadgenStatsToStore);
 	}
 

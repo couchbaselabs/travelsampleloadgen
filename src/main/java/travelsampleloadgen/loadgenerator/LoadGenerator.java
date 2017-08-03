@@ -51,10 +51,11 @@ public abstract class LoadGenerator {
 	
 	public LoadGenerator(String propertiesFile, String inputDataFile)
 			throws FileNotFoundException, IOException, ParseException {
-		this.numberOfOps = (Long) this.util.getLoadGenPropertyFromFilePath("NumberOfOps", propertiesFile);
-		this.creates = (Long) this.util.getLoadGenPropertyFromFilePath("Creates", propertiesFile);
-		this.updates = (Long) this.util.getLoadGenPropertyFromFilePath("Updates", propertiesFile);
-		this.deletes = (Long) this.util.getLoadGenPropertyFromFilePath("Deletes", propertiesFile);
+		Constants.getInstance().initializeLoadgenConstants();
+		this.numberOfOps = Constants.numberOfOps;
+		this.creates = Constants.creates;
+		this.updates = Constants.updates;
+		this.deletes = Constants.deletes;
 		this.numberOfCreates = 0;
 		this.numberOfDeletes = 0;
 		this.numberOfUpdates = 0;
@@ -349,7 +350,7 @@ public abstract class LoadGenerator {
 		}
 		list.add(loadgenStats);
 		loadgenStatsToStore.put("LoadgenData", list);
-		String loadGenStatsFilePath = (String) this.util.getLoadGenPropertyFromFilePath("loadgen-stats", Constants.getInstance().getLoadgenPropertiesFile());
+		String loadGenStatsFilePath = Constants.loadgen_stats_file;
 		this.util.updateLoadgenDataToFiles(loadGenStatsFilePath, loadgenStatsToStore);
 	}
 	

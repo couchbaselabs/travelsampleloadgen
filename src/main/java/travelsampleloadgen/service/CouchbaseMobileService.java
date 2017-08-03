@@ -24,11 +24,9 @@ public class CouchbaseMobileService {
 	
 	public CouchbaseMobileService() throws FileNotFoundException, IOException, ParseException {
 		Constants constants = Constants.getInstance();
-		String fileName = constants.getLoadgenPropertiesFile();
-		JSONParser parser = new JSONParser();
-		JSONObject properties = (JSONObject) parser.parse(new FileReader(fileName));
-		hostName = (String) properties.get("mobile-host");
-		db = (String) properties.get("mobile-db");
+		constants.initializeLoadgenConstants();
+		hostName = Constants.mobile_sync_host;
+		db = Constants.mobile_db;
 		this.baseUrlString = "http://" + hostName + "/" + db + "/";
 	}
 	

@@ -33,10 +33,11 @@ public abstract class LoadGeneratorWorkers implements Runnable {
 
 	public LoadGeneratorWorkers(long threadSeed, SharedWorkerData sharedWorkerData)
 			throws FileNotFoundException, IOException, ParseException {
+		Constants.getInstance().initializeLoadgenConstants();
 		String propertiesFilePath = Constants.getInstance().getLoadgenPropertiesFile();
-		this.creates = (Long) this.util.getLoadGenPropertyFromFilePath("Creates", propertiesFilePath);
-		this.updates = (Long) this.util.getLoadGenPropertyFromFilePath("Updates", propertiesFilePath);
-		this.deletes = (Long) this.util.getLoadGenPropertyFromFilePath("Deletes", propertiesFilePath);
+		this.creates = Constants.creates;
+		this.updates = Constants.updates;
+		this.deletes = Constants.deletes;
 		this.threadSeed = threadSeed;
 		this.sharedWorkerData = sharedWorkerData;
 		this.util.setSeed(this.threadSeed);
