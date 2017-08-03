@@ -42,6 +42,7 @@ public abstract class LoadGenerator {
 	private long masterSeed;
 	private boolean onlyCreates = true;
 	private Map<String, DocumentType> documentTypes;
+	private Utils util = new Utils();
 
 	public LoadGenerator() throws FileNotFoundException, IOException, ParseException {
 		this(Constants.getInstance().getLoadgenPropertiesFile(),
@@ -50,10 +51,10 @@ public abstract class LoadGenerator {
 	
 	public LoadGenerator(String propertiesFile, String inputDataFile)
 			throws FileNotFoundException, IOException, ParseException {
-		this.numberOfOps = (Long) Utils.getLoadGenPropertyFromFilePath("NumberOfOps", propertiesFile);
-		this.creates = (Long) Utils.getLoadGenPropertyFromFilePath("Creates", propertiesFile);
-		this.updates = (Long) Utils.getLoadGenPropertyFromFilePath("Updates", propertiesFile);
-		this.deletes = (Long) Utils.getLoadGenPropertyFromFilePath("Deletes", propertiesFile);
+		this.numberOfOps = (Long) this.util.getLoadGenPropertyFromFilePath("NumberOfOps", propertiesFile);
+		this.creates = (Long) this.util.getLoadGenPropertyFromFilePath("Creates", propertiesFile);
+		this.updates = (Long) this.util.getLoadGenPropertyFromFilePath("Updates", propertiesFile);
+		this.deletes = (Long) this.util.getLoadGenPropertyFromFilePath("Deletes", propertiesFile);
 		this.numberOfCreates = 0;
 		this.numberOfDeletes = 0;
 		this.numberOfUpdates = 0;
@@ -80,11 +81,8 @@ public abstract class LoadGenerator {
 	}
 
 	public void next() throws ParseException, FileNotFoundException, IOException {
-		Utils.setSeed(this.masterSeed);
-		int randomInt = 0;
-		for (long i = 0; i <= this.counter; i++) {
-			randomInt = Utils.getRandomInt(0, 100);
-		}
+		this.util.setSeed(this.masterSeed + this.counter);
+		int randomInt = this.util.getRandomInt(0, 100);
 		if (randomInt < this.creates || this.onlyCreates()) {
 			this.create();
 		} else if (randomInt < this.creates + this.updates) {
@@ -116,8 +114,8 @@ public abstract class LoadGenerator {
 				types.add("airport");
 			}
 		}
-		Utils.setSeed(this.createsSeed + this.numberOfCreates);
-		String randType = (String) Utils.getRandomArrayItem(types);
+		this.util.setSeed(this.createsSeed + this.numberOfCreates);
+		String randType = (String) this.util.getRandomArrayItem(types);
 		DocumentType documentType = this.documentTypes.get(randType);
 		this.createDocument(documentType);
 		this.numberOfCreates++;
@@ -156,8 +154,8 @@ public abstract class LoadGenerator {
 				types.remove(document.type);
 			}
 		}
-		Utils.setSeed(this.deletesSeed + this.numberOfDeletes);
-		String randType = (String) Utils.getRandomArrayItem(types);
+		this.util.setSeed(this.deletesSeed + this.numberOfDeletes);
+		String randType = (String) this.util.getRandomArrayItem(types);
 		DocumentType documentType = this.documentTypes.get(randType);
 		this.deleteDocument(documentType);
 		this.numberOfDeletes++;
@@ -172,9 +170,9 @@ public abstract class LoadGenerator {
 		while (!deleted && tries < 11) {
 			long randomId = 0;
 			if (tries == 10){
-				randomId = Utils.getRandomDocumentId(type);
+				randomId = this.util.getRandomDocumentId(type);
 			}else {
-				randomId = Utils.getRandomLong(firstDocument, lastDocument);
+				randomId = this.util.getRandomLong(firstDocument, lastDocument);
 			}
 			String document_name = type + "_" + randomId;
 			try {
@@ -208,8 +206,8 @@ public abstract class LoadGenerator {
 				types.remove(document.type);
 			}
 		}
-		Utils.setSeed(this.updatesSeed + this.numberOfUpdates);
-		String randType = (String) Utils.getRandomArrayItem(types);
+		this.util.setSeed(this.updatesSeed + this.numberOfUpdates);
+		String randType = (String) this.util.getRandomArrayItem(types);
 		DocumentType documentType = this.documentTypes.get(randType);
 		this.updateDocument(documentType);
 		this.numberOfUpdates++;
@@ -225,9 +223,9 @@ public abstract class LoadGenerator {
 		while (!updated && tries < 11) {
 			long randomId = 0;
 			if (tries == 10){
-				randomId = Utils.getRandomDocumentId(type);
+				randomId = this.util.getRandomDocumentId(type);
 			}else {
-				randomId = Utils.getRandomLong(firstDocument, lastDocument);
+				randomId = this.util.getRandomLong(firstDocument, lastDocument);
 			}
 			if (type.equals("airline")) {
 				template = new AirlineDocument(randomId, this.numberOfUpdates + 1, this.inputData);
@@ -268,7 +266,7 @@ public abstract class LoadGenerator {
 	public abstract boolean deleteDocumentFromServer(String documentId);
 
 	private Map<String, DocumentType> initiateDocumentTypes() {
-		Map<String, DocumentType> documentTypes = new HashMap<String, LoadGenerator.DocumentType>();
+		Map<String, DocumentType> documentTypes = new HashMap<String, DocumentType>();
 		DocumentType airline = new DocumentType("airline", 0);
 		DocumentType airport = new DocumentType("airport", 1);
 		DocumentType route = new DocumentType("route", 2);
@@ -316,10 +314,10 @@ public abstract class LoadGenerator {
 	}
 	
 	private void setSeeds() {
-		Utils.setSeed(this.masterSeed);
-		this.createsSeed = Utils.getRandomLong(0, this.masterSeed);
-		this.updatesSeed = Utils.getRandomLong(0, this.masterSeed);
-		this.deletesSeed = Utils.getRandomLong(0, this.masterSeed);
+		this.util.setSeed(this.masterSeed);
+		this.createsSeed = this.util.getRandomLong(0, this.masterSeed);
+		this.updatesSeed = this.util.getRandomLong(0, this.masterSeed);
+		this.deletesSeed = this.util.getRandomLong(0, this.masterSeed);
 	}
 
 	@SuppressWarnings("unused")
@@ -351,26 +349,8 @@ public abstract class LoadGenerator {
 		}
 		list.add(loadgenStats);
 		loadgenStatsToStore.put("LoadgenData", list);
-		String loadGenStatsFilePath = (String) Utils.getLoadGenPropertyFromFilePath("loadgen-stats", Constants.getInstance().getLoadgenPropertiesFile());
-		Utils.updateLoadgenDataToFiles(loadGenStatsFilePath, loadgenStatsToStore);
-	}
-	
-	class DocumentType {
-		String type;
-		int offSet;
-		long firstDocument;
-		long lastDocument;
-		long lastIteration;
-		long numCreated;
-
-		DocumentType(String type, int offset) {
-			this.type = type;
-			this.offSet = offset;
-			this.firstDocument = 10000 * offset;
-			this.lastDocument = 10000 * offset;
-			this.lastIteration = 10000 * offset;
-			this.numCreated = 0;
-		}
+		String loadGenStatsFilePath = (String) this.util.getLoadGenPropertyFromFilePath("loadgen-stats", Constants.getInstance().getLoadgenPropertiesFile());
+		this.util.updateLoadgenDataToFiles(loadGenStatsFilePath, loadgenStatsToStore);
 	}
 	
 	class LoadgenStats {

@@ -1,5 +1,5 @@
 {
-	"NumberOfOps": 200,
+	"NumberOfOps": 25,
 	"Creates" : 50,
 	"Updates" : 40,
 	"Deletes" : 10,
@@ -8,5 +8,6 @@
 	"bucket-password": "",
 	"loadgen-stats": "/tmp/loadgenseeds.json",
 	"mobile-host": "10.111.170.101:4984" ,
-	"mobile-db": "travel-sample"
+	"mobile-db": "travel-sample",
+	"threads": 2
 }

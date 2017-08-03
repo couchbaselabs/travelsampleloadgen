@@ -41,6 +41,7 @@ public class CouchbaseCURDService {
 			this.bucket.insert(document);
 			return true;
 		} catch (Exception e) {
+			System.out.println(document_name);
 			System.out.println(e);
 			return false;
 		}

@@ -40,6 +40,7 @@ public class RouteDocument extends DocumentTemplate {
 	public static long maxAirlineId;
 	public static long minAirportId;
 	public static long maxAirportId;
+	Utils util = new Utils();
 
 	/**
 	 * @param id
@@ -86,7 +87,7 @@ public class RouteDocument extends DocumentTemplate {
 	 *            the stops to set
 	 */
 	public void setStops() {
-		this.stops = Utils.getRandomInt(0, 3);
+		this.stops = util.getRandomInt(0, 3);
 	}
 
 	/**
@@ -94,10 +95,10 @@ public class RouteDocument extends DocumentTemplate {
 	 *            the equipment to set
 	 */
 	public void setEquipment() {
-		int numberOfEquipment = Utils.getRandomInt(1, 3);
+		int numberOfEquipment = util.getRandomInt(1, 3);
 		this.equipment = "";
 		for (int i = 0; i < numberOfEquipment; i++) {
-			this.equipment += Utils.getRandomInt(0, 999) + " ";
+			this.equipment += util.getRandomInt(0, 999) + " ";
 		}
 		this.equipment.trim();
 	}
@@ -107,17 +108,17 @@ public class RouteDocument extends DocumentTemplate {
 	 *            the schedule to set
 	 */
 	public void setSchedule() {
-		int numberOfSchedules = Utils.getRandomInt(3, 20);
+		int numberOfSchedules = util.getRandomInt(3, 20);
 		List<Schedule> schedules = new ArrayList<Schedule>();
 		for (int i = 0; i < numberOfSchedules; i++) {
 			Schedule schedule = new Schedule();
-			Date randDate = Utils.getRandomDate(0, Math.abs(System.currentTimeMillis()));
+			Date randDate = util.getRandomDate(0, Math.abs(System.currentTimeMillis()));
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(randDate);
 			int day = calendar.get(Calendar.DAY_OF_WEEK);
 			SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 			String utc = sdf.format(randDate);
-			String flight = this.airline + Utils.getRandomInt(100, 999);
+			String flight = this.airline + util.getRandomInt(100, 999);
 			schedule.day = day;
 			schedule.utc = utc;
 			schedule.flight = flight;
@@ -131,7 +132,7 @@ public class RouteDocument extends DocumentTemplate {
 	 *            the distance to set
 	 */
 	public void setDistance() {
-		this.distance = Utils.getRandomFloat(100, 10000);
+		this.distance = util.getRandomFloat(100, 10000);
 	}
 
 	private void getAirlineAndAirports() throws FileNotFoundException, IOException, ParseException {
@@ -167,9 +168,9 @@ public class RouteDocument extends DocumentTemplate {
 		while (!found && tries < 11) {
 			airlineDocumentId = "airline_";
 			if (tries == 10) {
-				airlineid = Utils.getRandomDocumentId("airline");
+				airlineid = util.getRandomDocumentId("airline");
 			} else {
-				airlineid = Utils.getRandomLong(minAirlineId, maxAirlineId);
+				airlineid = util.getRandomLong(minAirlineId, maxAirlineId);
 			}
 			airlineDocumentId += airlineid;
 			if (cbCURDHelper.checkIfDocumentExists(airlineDocumentId)) {
@@ -190,9 +191,9 @@ public class RouteDocument extends DocumentTemplate {
 		while (!found && tries < 11) {
 			airportDocumentId = "airport_";
 			if (tries == 10) {
-				sourceAirportId = Utils.getRandomDocumentId("airport");
+				sourceAirportId = util.getRandomDocumentId("airport");
 			} else {
-				sourceAirportId = Utils.getRandomLong(minAirportId, maxAirportId);
+				sourceAirportId = util.getRandomLong(minAirportId, maxAirportId);
 			}
 			airportDocumentId += sourceAirportId;
 			if (cbCURDHelper.checkIfDocumentExists(airportDocumentId)) {
@@ -213,9 +214,9 @@ public class RouteDocument extends DocumentTemplate {
 		while ((sourceAirportId == destinationAirportId || !found) && tries < 20) {
 			airportDocumentId = "airport_";
 			if (tries >= 10) {
-				destinationAirportId = Utils.getRandomDocumentId("airport");
+				destinationAirportId = util.getRandomDocumentId("airport");
 			} else {
-				destinationAirportId = Utils.getRandomLong(minAirportId, maxAirportId);
+				destinationAirportId = util.getRandomLong(minAirportId, maxAirportId);
 			}
 			airportDocumentId += destinationAirportId;
 			if (cbCURDHelper.checkIfDocumentExists(airportDocumentId)) {
@@ -232,7 +233,7 @@ public class RouteDocument extends DocumentTemplate {
 	}
 
 	private void updateDocument() {
-		int randomInt = Utils.getRandomInt(1, 4);
+		int randomInt = util.getRandomInt(1, 4);
 		switch (randomInt) {
 		case 1:
 			this.setEquipment();
@@ -250,7 +251,7 @@ public class RouteDocument extends DocumentTemplate {
 			throws FileNotFoundException, IOException, ParseException {
 		this.routeData = routeData;
 		this.setSeed(seed, 0);
-		Utils.setSeed(this.revisionSeed);
+		util.setSeed(this.revisionSeed);
 		this.setId();
 		this.getAirlineAndAirports();
 		this.setAirline();

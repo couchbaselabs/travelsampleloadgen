@@ -11,7 +11,10 @@ import org.apache.commons.cli.Options;
 import org.json.simple.parser.ParseException;
 
 import travelsampleloadgen.loadgenerator.LoadGenerator;
+import travelsampleloadgen.loadgenerator.LoadGeneratorMainThread;
 import travelsampleloadgen.loadgenerator.MobileLoadGenerator;
+import travelsampleloadgen.loadgenerator.MobileLoadGeneratorThread;
+import travelsampleloadgen.loadgenerator.QueryLoadGenerator;
 import travelsampleloadgen.loadgenerator.SDKLoadGenerator;
 import travelsampleloadgen.service.CouchbaseService;
 import travelsampleloadgen.util.Constants;
@@ -24,16 +27,29 @@ public class TravelSampleLoadGenerator {
 			TravelSampleLoadGenerator.getOptions(args);
 		} catch (org.apache.commons.cli.ParseException e1) {
 			e1.printStackTrace();
+			return;
 		}
 		try {
-			if (!mobile) {
-				LoadGenerator loadGen = new SDKLoadGenerator();
-				loadGen.generate();
-			} else {
-				LoadGenerator loadGen = new MobileLoadGenerator();
-				loadGen.generate();
+			for(int i=0; i < 5; i++) {
+				long threadStart = System.currentTimeMillis();
+				LoadGeneratorMainThread loadgen = new LoadGeneratorMainThread(mobile);
+				loadgen.start();
+				//QueryLoadGenerator queryLoadgen = new QueryLoadGenerator();
+				//queryLoadgen.start();
+				loadgen.join();
+				long threadStop = System.currentTimeMillis();
+				//queryLoadgen.setStopThread(true);
+				//queryLoadgen.join();
+				Thread.sleep(10000);
+				long oldStart = System.currentTimeMillis();
+				LoadGenerator load = new SDKLoadGenerator();
+				load.generate();
+				long oldStop = System.currentTimeMillis();
+				System.out.println("Thread = " + (threadStop - threadStart));
+				System.out.println("Old = " + (oldStop - oldStart));
+				System.out.println();
+				Thread.sleep(10000);
 			}
-
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
