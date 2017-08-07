@@ -4,6 +4,8 @@
 	"Updates" : 40,
 	"Deletes" : 10,
 	"couchbase-host": "10.111.170.101,10.111.170.102",
+	"couchbase-admin-username": "Administrator",
+	"couchbase-admin-password": "password",
 	"bucket": "travel-sample",
 	"bucket-password": "",
 	"loadgen-stats": "/tmp/loadgenseeds.json",

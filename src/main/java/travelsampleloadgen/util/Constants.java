@@ -15,6 +15,8 @@ public class Constants {
 	public static long updates;
 	public static long deletes;
 	public static String couchbase_host;
+	public static String couchbase_admin_username;
+	public static String couchbase_admin_password;
 	public static String bucket;
 	public static String bucket_password;
 	public static String loadgen_stats_file;
@@ -69,6 +71,8 @@ public class Constants {
 		updates = (Long ) util.getLoadGenPropertyFromFilePath("Updates", propertiesFile);
 		deletes = (Long ) util.getLoadGenPropertyFromFilePath("Deletes", propertiesFile);
 		couchbase_host = (String ) util.getLoadGenPropertyFromFilePath("couchbase-host", propertiesFile);
+		couchbase_admin_username = (String)util.getLoadGenPropertyFromFilePath("couchbase-admin-username", propertiesFile);
+		couchbase_admin_password = (String)util.getLoadGenPropertyFromFilePath("couchbase-admin-password", propertiesFile);
 		bucket = (String ) util.getLoadGenPropertyFromFilePath("bucket", propertiesFile);
 		bucket_password = (String ) util.getLoadGenPropertyFromFilePath("bucket-password", propertiesFile);
 		loadgen_stats_file = (String ) util.getLoadGenPropertyFromFilePath("loadgen-stats", propertiesFile);
