@@ -37,6 +37,7 @@ public class CouchbaseService {
 		String bucketName = Constants.bucket;
 		String bucketPassword = Constants.bucket_password;
 		this.couchbaseCluster = CouchbaseCluster.create(hostNames);
+		this.couchbaseCluster.authenticate(Constants.couchbase_admin_username, Constants.couchbase_admin_password);
 		this.bucket = couchbaseCluster.openBucket(bucketName, bucketPassword);
 	}
 	
