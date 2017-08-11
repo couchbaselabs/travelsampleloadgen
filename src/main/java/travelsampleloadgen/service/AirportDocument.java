@@ -24,6 +24,7 @@ public class AirportDocument extends DocumentTemplate {
 	public Map<?, ?> geo;
 	private JSONObject airportData;
 	public Airport airport;
+	Utils util = new Utils();
 	
 	/**
 	 * @param id the id to set
@@ -37,8 +38,8 @@ public class AirportDocument extends DocumentTemplate {
 	 * @param airportname the airportname to set
 	 */
 	public void setAirportname() {
-		int length = Utils.getRandomInt(5, 10);
-		String name = Utils.getRandomString(length, false);
+		int length = util.getRandomInt(8, 25);
+		String name = util.getRandomName(length, false);
 		this.airportname = name;
 	}
 
@@ -49,7 +50,7 @@ public class AirportDocument extends DocumentTemplate {
 	public void setCity() {
 		JSONObject country = (JSONObject) this.airportData.get(this.country);
 		JSONArray cities = (JSONArray) country.get("city");
-		this.city = (String) Utils.getRandomJsonArrayItem(cities);
+		this.city = (String) util.getRandomJsonArrayItem(cities);
 	}
 
 
@@ -58,7 +59,7 @@ public class AirportDocument extends DocumentTemplate {
 	 */
 	public void setCountry() {
 		JSONArray countries = (JSONArray)this.airportData.get("country");
-		this.country = (String) Utils.getRandomJsonArrayItem(countries);
+		this.country = (String) util.getRandomJsonArrayItem(countries);
 	}
 
 
@@ -66,7 +67,7 @@ public class AirportDocument extends DocumentTemplate {
 	 * @param faa the faa to set
 	 */
 	public void setFaa() {
-		String faa = Utils.getRandomString(3, this.airportname);
+		String faa = util.getRandomString(3, this.airportname);
 		this.faa = faa;
 	}
 
@@ -75,7 +76,7 @@ public class AirportDocument extends DocumentTemplate {
 	 * @param icao the icao to set
 	 */
 	public void setIcao() {
-		char randChar = Utils.getRandomChar(this.airportname);
+		char randChar = util.getRandomChar(this.airportname);
 		String icao = this.faa + randChar;
 		this.icao = icao;
 	}
@@ -87,7 +88,7 @@ public class AirportDocument extends DocumentTemplate {
 	public void setTz() {
 		JSONObject countryDetails = (JSONObject)this.airportData.get(this.country);
 		JSONArray timeZones = (JSONArray)countryDetails.get("timeZone");
-		this.tz = (String) Utils.getRandomJsonArrayItem(timeZones);
+		this.tz = (String) util.getRandomJsonArrayItem(timeZones);
 	}
 
 
@@ -96,14 +97,14 @@ public class AirportDocument extends DocumentTemplate {
 	 */
 	public void setGeo() {
 		Map<String, Float> geo = new HashMap<String, Float>();
-		geo.put("lat", Utils.getRandomFloat(-90, 90));
-		geo.put("lon", Utils.getRandomFloat(-180, 180));
-		geo.put("alt", Utils.getRandomFloat(0, 3000));
+		geo.put("lat", util.getRandomFloat(-90, 90));
+		geo.put("lon", util.getRandomFloat(-180, 180));
+		geo.put("alt", util.getRandomFloat(0, 3000));
 		this.geo = geo;
 	}
 	
 	private void updateDocument() {
-		int randomInt = Utils.getRandomInt(1, 4);
+		int randomInt = util.getRandomInt(1, 4);
 		switch(randomInt) {
 		case 1:
 			this.setGeo();
@@ -120,7 +121,7 @@ public class AirportDocument extends DocumentTemplate {
 	public AirportDocument(long seed, long revison, JSONObject airportData) {
 		this.airportData = airportData;
 		this.setSeed(seed, 0);
-		Utils.setSeed(this.revisionSeed);
+		util.setSeed(this.revisionSeed);
 		this.setId();
 		this.setAirportname();
 		this.setFaa();

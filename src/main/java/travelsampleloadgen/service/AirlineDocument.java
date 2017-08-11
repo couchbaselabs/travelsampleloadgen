@@ -20,6 +20,7 @@ public class AirlineDocument extends DocumentTemplate {
 	public String callsign;
 	public String country;
 	private JSONObject airlineData;
+	Utils util = new Utils();
 	/**
 	 * @param id the id to set
 	 */
@@ -30,22 +31,22 @@ public class AirlineDocument extends DocumentTemplate {
 	 * @param name the name to set
 	 */
 	public void setName() {
-		int length = Utils.getRandomInt(4, 10);
-		String name = Utils.getRandomString(length, true);
+		int length = util.getRandomInt(8, 15);
+		String name = util.getRandomName(length, true);
 		this.name = name;
 	}
 	/**
 	 * @param iata the iata to set
 	 */
 	public void setIata() {
-		String iata = Utils.getRandomString(2, this.name);
+		String iata = util.getRandomString(2, this.name);
 		this.iata = iata.toUpperCase();
 	}
 	/**
 	 * @param icao the icao to set
 	 */
 	public void setIcao() {
-		char randChar = Utils.getRandomChar(this.name);
+		char randChar = util.getRandomChar(this.name);
 		String icao = this.iata + randChar;
 		this.icao = icao.toUpperCase();
 	}
@@ -61,11 +62,11 @@ public class AirlineDocument extends DocumentTemplate {
 	 */
 	public void setCountry() {
 		JSONArray countries = (JSONArray)this.airlineData.get("country");
-		this.country = (String) Utils.getRandomJsonArrayItem(countries);
+		this.country = (String) util.getRandomJsonArrayItem(countries);
 	}
 	
 	private void updateDocument() {
-		int randomInt = Utils.getRandomInt(1, 4);
+		int randomInt = util.getRandomInt(1, 4);
 		switch(randomInt) {
 		case 1:
 			this.setCountry();
@@ -82,7 +83,7 @@ public class AirlineDocument extends DocumentTemplate {
 	public AirlineDocument(long seed, long revison, JSONObject airlineData) {
 		this.airlineData = airlineData;
 		this.setSeed(seed, 0);
-		Utils.setSeed(this.revisionSeed);
+		util.setSeed(this.revisionSeed);
 		this.setId();
 		this.setName();
 		this.setIata();

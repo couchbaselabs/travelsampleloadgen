@@ -1,12 +1,15 @@
 {
-	"NumberOfOps": 200,
+	"NumberOfOps": 25,
 	"Creates" : 50,
 	"Updates" : 40,
 	"Deletes" : 10,
 	"couchbase-host": "10.111.170.101,10.111.170.102",
+	"couchbase-admin-username": "Administrator",
+	"couchbase-admin-password": "password",
 	"bucket": "travel-sample",
 	"bucket-password": "",
 	"loadgen-stats": "/tmp/loadgenseeds.json",
 	"mobile-host": "10.111.170.101:4984" ,
-	"mobile-db": "travel-sample"
+	"mobile-db": "travel-sample",
+	"threads": 2
 }

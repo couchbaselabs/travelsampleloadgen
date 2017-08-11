@@ -11,7 +11,10 @@ import org.apache.commons.cli.Options;
 import org.json.simple.parser.ParseException;
 
 import travelsampleloadgen.loadgenerator.LoadGenerator;
+import travelsampleloadgen.loadgenerator.LoadGeneratorMainThread;
 import travelsampleloadgen.loadgenerator.MobileLoadGenerator;
+import travelsampleloadgen.loadgenerator.MobileLoadGeneratorThread;
+import travelsampleloadgen.loadgenerator.QueryLoadGenerator;
 import travelsampleloadgen.loadgenerator.SDKLoadGenerator;
 import travelsampleloadgen.service.CouchbaseService;
 import travelsampleloadgen.util.Constants;
@@ -24,16 +27,25 @@ public class TravelSampleLoadGenerator {
 			TravelSampleLoadGenerator.getOptions(args);
 		} catch (org.apache.commons.cli.ParseException e1) {
 			e1.printStackTrace();
+			return;
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		try {
-			if (!mobile) {
-				LoadGenerator loadGen = new SDKLoadGenerator();
-				loadGen.generate();
-			} else {
-				LoadGenerator loadGen = new MobileLoadGenerator();
-				loadGen.generate();
-			}
-
+			LoadGeneratorMainThread loadgen = new LoadGeneratorMainThread(mobile);
+			loadgen.start();
+			QueryLoadGenerator queryLoadgen = new QueryLoadGenerator();
+			queryLoadgen.start();
+			loadgen.join();
+			queryLoadgen.setStopThread(true);
+			queryLoadgen.join();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -58,12 +70,13 @@ public class TravelSampleLoadGenerator {
 		}
 	}
 
-	public static void getOptions(String[] args) throws org.apache.commons.cli.ParseException {
+	public static void getOptions(String[] args)
+			throws org.apache.commons.cli.ParseException, FileNotFoundException, IOException, ParseException {
 		Options options = new Options();
 		Option loadGenPropertiesFilePath = Option.builder().desc("Loadgenerator Properties File path").hasArg()
 				.longOpt("loadgen-properties").required(false).argName("file-path").build();
 		Option sampleDataFilePath = Option.builder().desc("Loadgen sample data file path").hasArg()
-				.longOpt("sample-data-file").required(true ).argName("file-path").build();
+				.longOpt("sample-data-file").required(true).argName("file-path").build();
 		options.addOption(loadGenPropertiesFilePath);
 		options.addOption(sampleDataFilePath);
 		options.addOption("m", "mobile", false, "Load generate through Mobile sync gateway");
@@ -82,6 +95,7 @@ public class TravelSampleLoadGenerator {
 		} else {
 			mobile = false;
 		}
+		constants.initializeLoadgenConstants();
 	}
 
 }

@@ -18,54 +18,54 @@ import com.google.gson.Gson;
 import travelsampleloadgen.service.CouchbaseQueryService;
 
 public class Utils {
-	private static Random random = new Random();
+	private Random random = new Random();
 
-	public static void setSeed(long seed) {
-		random.setSeed(seed);
+	public void setSeed(long seed) {
+		this.random.setSeed(seed);
 	}
 
-	public static Random getRandomGenerator() {
+	public Random getRandomGenerator() {
 		return random;
 	}
 
-	public static int getRandomInt(int min, int max) {
-		return random.nextInt(max - min + 1) + min;
+	public int getRandomInt(int min, int max) {
+		return this.random.nextInt(max - min + 1) + min;
 	}
 	
-	public static long getRandomLong(long min, long max) {
-		return (long)(random.nextDouble() * (max - min)) + min;
+	public long getRandomLong(long min, long max) {
+		return (long)(this.random.nextDouble() * (max - min)) + min;
 	}
 	
-	public static float getRandomFloat(int min, int max) {
-		return random.nextFloat() * (max - min) + min;
+	public float getRandomFloat(int min, int max) {
+		return this.random.nextFloat() * (max - min) + min;
 	}
 
-	public static boolean getRandomBoolean() {
-		return random.nextBoolean();
+	public boolean getRandomBoolean() {
+		return this.random.nextBoolean();
 	}
 
-	public static Date getRandomDate(long min, long max) {
-		long randomMilliseconds = (long) (random.nextDouble() * (max - min)) + min;
+	public Date getRandomDate(long min, long max) {
+		long randomMilliseconds = (long) (this.random.nextDouble() * (max - min)) + min;
 		return new Date(randomMilliseconds);
 	}
 
-	public static char getRandomChar() {
+	public char getRandomChar() {
 		String charSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-		return charSet.charAt(random.nextInt(charSet.length()));
+		return charSet.charAt(this.random.nextInt(charSet.length()));
 	}
 	
-	public static char getRandomChar(String charSet) {
-		return charSet.charAt(random.nextInt(charSet.length()));
+	public char getRandomChar(String charSet) {
+		return charSet.charAt(this.random.nextInt(charSet.length()));
 	}
 	
-	public static String getRandomString(int length, boolean withNumbers) {
+	public String getRandomString(int length, boolean withNumbers) {
 		String charSet = " abcdef ghijklm nopqrstuvwxyz ";
 		if(withNumbers) {
 			charSet += "1234 567890 ";
 		}
 		char[] randomString = new char[length];
 		for(int i=0;i<length;i++) {
-			randomString[i] = charSet.charAt(random.nextInt(charSet.length()));
+			randomString[i] = charSet.charAt(this.random.nextInt(charSet.length()));
 		}
 //		randomString[randomString.length - 1] = '\0';
 		boolean found = false;
@@ -81,52 +81,84 @@ public class Utils {
 		return new String(randomString);
 	}
 	
-	public static String getRandomString(int length, String charSet) {
+	public String getRandomName(int length, boolean withNumbers) {
+		String charSet = " abcdef ghijklm nopqrstuvwxyz ";
+		if(withNumbers) {
+			charSet += "1234 567890 ";
+		}
+		String charSetWithoutSpace = charSet.replaceAll("\\s+", "");
+		char[] randomString = new char[length];
+		for(int i = 0; i < 3; i++) {
+			randomString[i] = charSetWithoutSpace.charAt(this.random.nextInt(charSetWithoutSpace.length()));
+		}
+		for(int i = 3; i < length - 3; i++) {
+			randomString[i] = charSet.charAt(this.random.nextInt(charSet.length()));
+		}
+		for(int i = length - 3; i < length; i++) {
+			randomString[i] = charSetWithoutSpace.charAt(this.random.nextInt(charSetWithoutSpace.length()));
+		}
+		boolean found = false;
+		for(int i = 0; i < randomString.length; i++) {
+			if (!found && Character.isLetter(randomString[i])) {
+				randomString[i] = Character.toUpperCase(randomString[i]);
+				found = true;
+			} 
+			else if (Character.isWhitespace(randomString[i]) || Character.isDigit(randomString[i])) {
+				found = false;
+			}
+		}
+		return new String(randomString);
+	}
+	
+	public String getRandomString(int length, String charSet) {
 		charSet = charSet.replaceAll("\\s+", "");
 		char[] randomString = new char[length];
 		for(int i=0;i<length;i++) {
-			randomString[i] = charSet.charAt(random.nextInt(charSet.length()));
+			randomString[i] = charSet.charAt(this.random.nextInt(charSet.length()));
 			
 		}
 //		randomString[randomString.length - 1] = '\0';
 		return new String(randomString);
 	}
 	
-	public static Object getRandomArrayItem(ArrayList<?> list) {
+	public Object getRandomArrayItem(ArrayList<?> list) {
 		if(list.size() == 1) {
 			return list.get(0);
 		}
-		return list.get(random.nextInt(list.size()));
+		return list.get(this.random.nextInt(list.size()));
 	}
 	
-	public static Object getRandomJsonArrayItem(JSONArray array) {
+	public Object getRandomJsonArrayItem(JSONArray array) {
+		if(array.size() == 0) {
+			return null;
+		}
 		if(array.size() == 1) {
 			return array.get(0);
 		}
-		return array.get(random.nextInt(array.size()));
+		return array.get(this.random.nextInt(array.size()));
 	}
 	
-	public static String getFilePathFromResources(String fileName) {
-		ClassLoader classLoader = Utils.class.getClassLoader();
+	public String getFilePathFromResources(String fileName) {
+		ClassLoader classLoader = this.getClass().getClassLoader();
 		return classLoader.getResource(fileName).getPath();
 	}
 	
-	public static Object getLoadGenPropertyFromResource(String propertyName, String fileName) throws FileNotFoundException, IOException, ParseException {
-		ClassLoader classLoader = Utils.class.getClassLoader();
+	public Object getLoadGenPropertyFromResource(String propertyName, String fileName) throws FileNotFoundException, IOException, ParseException {
+		ClassLoader classLoader = this.getClass().getClassLoader();
 		String filePath = classLoader.getResource(fileName).getPath();
 		JSONParser parser = new JSONParser();
 		JSONObject properties = (JSONObject) parser.parse(new FileReader(filePath));
 		return properties.get(propertyName);
 	}
 	
-	public static Object getLoadGenPropertyFromFilePath(String propertyName, String filePath) throws FileNotFoundException, IOException, ParseException {
+	public Object getLoadGenPropertyFromFilePath(String propertyName, String filePath) throws FileNotFoundException, IOException, ParseException {
 		JSONParser parser = new JSONParser();
 		JSONObject properties = (JSONObject) parser.parse(new FileReader(filePath));
 		return properties.get(propertyName);
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static JSONObject deepMergeJSONObjects(JSONObject source, JSONObject target) {
+	public JSONObject deepMergeJSONObjects(JSONObject source, JSONObject target) {
 	    for (Object key: source.keySet()) {
 	            Object value = source.get(key);
 	            if (!target.containsKey(key)) {
@@ -151,22 +183,33 @@ public class Utils {
 	    return target;
 	}
 	
-	public static void updateLoadgenDataToFiles(String filePath, Object objectToStore) throws ParseException, FileNotFoundException, IOException {
+	public void updateLoadgenDataToFiles(String filePath, Object objectToStore) throws ParseException, FileNotFoundException, IOException {
 		JSONParser parser = new JSONParser();
 		Gson gson = new Gson();
-		JSONObject originalJson = (JSONObject) parser.parse(new FileReader(filePath));
+		FileReader reader;
+		try {
+		reader = new FileReader(filePath);
+		} catch(FileNotFoundException e) {
+			FileWriter newFile = new FileWriter(filePath);
+			newFile.write("{}");
+			newFile.flush();
+			newFile.close();
+			reader = new FileReader(filePath);
+		}
+		JSONObject originalJson = (JSONObject) parser.parse(reader);
 		JSONObject appendJson = (JSONObject) parser.parse(gson.toJson(objectToStore));
-		JSONObject jsonToStore = Utils.deepMergeJSONObjects(appendJson, originalJson);
+		JSONObject jsonToStore = this.deepMergeJSONObjects(appendJson, originalJson);
+		reader.close();
 		FileWriter writer = new FileWriter(filePath);
 		writer.write(jsonToStore.toJSONString());
 		writer.flush();
 		writer.close();
 	}
 	
-	public static long getRandomDocumentId(String type) throws ParseException, FileNotFoundException, IOException {
+	public long getRandomDocumentId(String type) throws ParseException, FileNotFoundException, IOException {
 		CouchbaseQueryService queryHelper = new CouchbaseQueryService();
 		JSONArray documentIds = queryHelper.getExistingDocumentIdsFromBucket(type);
-		JSONObject randomDocumentId = (JSONObject) Utils.getRandomJsonArrayItem(documentIds);
+		JSONObject randomDocumentId = (JSONObject) this.getRandomJsonArrayItem(documentIds);
 		long randomId = (Long) randomDocumentId.get("id");
 		return randomId;
 	}

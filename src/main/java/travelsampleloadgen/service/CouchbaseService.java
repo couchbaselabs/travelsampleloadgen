@@ -31,13 +31,11 @@ public class CouchbaseService {
 	
 	private CouchbaseService() throws FileNotFoundException, IOException, ParseException {
 		Constants constants = Constants.getInstance();
-		String fileName = constants.getLoadgenPropertiesFile();
-		JSONParser parser = new JSONParser();
-		JSONObject properties = (JSONObject) parser.parse(new FileReader(fileName));
-		String hostName = (String) properties.get("couchbase-host");
+		constants.initializeLoadgenConstants();
+		String hostName = Constants.couchbase_host;
 		List<String> hostNames = new ArrayList<String>(Arrays.asList(hostName.split(",")));
-		String bucketName = (String)properties.get("bucket");
-		String bucketPassword = (String)properties.get("bucket-password");
+		String bucketName = Constants.bucket;
+		String bucketPassword = Constants.bucket_password;
 		this.couchbaseCluster = CouchbaseCluster.create(hostNames);
 		this.bucket = couchbaseCluster.openBucket(bucketName, bucketPassword);
 	}
