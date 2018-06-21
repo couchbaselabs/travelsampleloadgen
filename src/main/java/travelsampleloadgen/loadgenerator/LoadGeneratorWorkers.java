@@ -50,9 +50,7 @@ public abstract class LoadGeneratorWorkers implements Runnable {
 		int randomInt = this.util.getRandomInt(0, 100);
 		try {
 			if (randomInt < this.creates || this.sharedWorkerData.onlyCreates()) {
-
 				this.create();
-
 			} else if (randomInt < this.creates + this.updates) {
 				this.update();
 			} else {
