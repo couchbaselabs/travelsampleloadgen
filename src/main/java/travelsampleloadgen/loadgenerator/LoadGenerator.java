@@ -136,6 +136,7 @@ public abstract class LoadGenerator {
 			template = new RouteDocument(seed, 0, this.inputData);
 		}
 		JSONObject jsonDocument = template.getJsonObject();
+
 		String documentId = type + "_" + jsonDocument.get("id").toString();
 		boolean success = this.createDocumentToServer(jsonDocument, documentId);
 		if (success) {

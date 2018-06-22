@@ -23,19 +23,28 @@ import com.couchbase.client.java.query.Select;
 import com.couchbase.client.java.query.Statement;
 import com.google.gson.Gson;
 
+import com.couchbase.client.crypto.RSACryptoProvider;
+import com.couchbase.client.java.document.json.ValueEncryptionConfig;
+
 public class CouchbaseCURDService {
 	private Bucket bucket;
+	private ValueEncryptionConfig rsaConfig;
 	
-	public CouchbaseCURDService() throws FileNotFoundException, IOException, ParseException {
+	public CouchbaseCURDService() throws FileNotFoundException, IOException, ParseException, Exception {
 		this.bucket = CouchbaseService.getInstance().getBucket();
+		this.rsaConfig = CouchbaseService.getInstance().getValueCryptoConfig();
 	}
 	
-	public void closeCouchbase() throws FileNotFoundException, IOException, ParseException {
+	public void closeCouchbase() throws FileNotFoundException, IOException, ParseException, Exception {
 		CouchbaseService.closeCouchbaseConnections();
 	}
 	
 	public boolean insertToBucket(JSONObject json, String document_name) {
 		JsonObject jsonObject = JsonObject.fromJson(json.toJSONString());
+
+		// encrypt some data
+		jsonObject = encryptFields(jsonObject);
+
 		JsonDocument document = JsonDocument.create(document_name, jsonObject);
 		try {
 			this.bucket.insert(document);
@@ -53,6 +62,7 @@ public class CouchbaseCURDService {
         		throw new DocumentDoesNotExistException("Document " + document_name + " does not exist in the bucket");
         }
 		JsonObject jsonObject = JsonObject.fromJson(json.toJSONString());
+		jsonObject = encryptFields(jsonObject);
 		document = JsonDocument.create(document_name, jsonObject);
 		try {
 			this.bucket.upsert(document);
@@ -99,5 +109,19 @@ public class CouchbaseCURDService {
 			result.add(row.value());
 		}
 		return result;
+	}
+
+	public JsonObject encryptFields(JsonObject jsonObject) {
+		// encrypt some data
+		if (jsonObject.containsKey("airportname")) { //airport doc
+			jsonObject.put("airportname", jsonObject.getString("airportname"), rsaConfig);
+		}
+		if (jsonObject.containsKey("sourceairport")) { //route doc
+			jsonObject.put("sourceairport", jsonObject.getString("sourceairport"), rsaConfig);
+		}
+		if (jsonObject.containsKey("callsign")) { //airline doc
+			jsonObject.put("callsign", jsonObject.getString("callsign"), rsaConfig);
+		}
+		return jsonObject;
 	}
 }
